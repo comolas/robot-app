@@ -52,6 +52,8 @@ async def lifespan(app):
     global rag_engine
     cleanup_audio()
     asyncio.create_task(_periodic_cleanup())
+    yield
+    return
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("GOOGLE_API_KEY bulunamadı!")
@@ -82,6 +84,41 @@ async def lifespan(app):
 app = FastAPI(title="Okul Tanıtım Robot API", lifespan=lifespan)
 
 # CORS ayarları
+def ensure_rag_engine() -> RAGEngine:
+    """Load the RAG engine lazily so Cloud Run can pass startup checks."""
+    global rag_engine
+    if rag_engine:
+        return rag_engine
+
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GOOGLE_API_KEY bulunamadi")
+
+    engine = RAGEngine(api_key)
+    if os.path.exists("./vectordb"):
+        print("Mevcut vektor veritabani yukleniyor...")
+        engine.load_existing_db()
+    else:
+        school_url = os.getenv("SCHOOL_WEBSITE_URL", "")
+        if school_url:
+            try:
+                print(f"Web sitesi taraniyor: {school_url}")
+                char_count = engine.load_from_url(school_url)
+                print(f"Web sitesinden {char_count} karakter yuklendi.")
+            except Exception as e:
+                print(f"Web sitesi taranamadi: {e}")
+                if os.path.exists("./data/okul_bilgileri.md"):
+                    print("Markdown dosyasindan yukleniyor...")
+                    engine.load_documents("./data/okul_bilgileri.md")
+        elif os.path.exists("./data/okul_bilgileri.md"):
+            print("Vektor veritabani olusturuluyor...")
+            engine.load_documents("./data/okul_bilgileri.md")
+        else:
+            print("UYARI: Veri kaynagi bulunamadi!")
+
+    rag_engine = engine
+    return rag_engine
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -159,8 +196,8 @@ class EvaluateRequest(BaseModel):
 @app.post("/ask", response_model=Answer)
 async def ask_question(question: Question):
     """Arduino'dan gelen soruyu yanıtla"""
-    if not rag_engine:
-        raise HTTPException(status_code=500, detail="RAG engine yüklenmedi")
+    global rag_engine
+    rag_engine = ensure_rag_engine()
     
     try:
         # Galeri komutu mu kontrol et
