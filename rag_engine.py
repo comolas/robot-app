@@ -2,10 +2,9 @@ import os
 import re
 import pickle
 from pathlib import Path
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
@@ -13,8 +12,9 @@ from langchain_core.output_parsers import StrOutputParser
 class RAGEngine:
     def __init__(self, api_key: str):
         # Lokal embedding modeli (ücretsiz, internet gerektirmez)
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+        self.embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/text-embedding-004",
+            google_api_key=api_key,
         )
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-flash-latest",
