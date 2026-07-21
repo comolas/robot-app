@@ -1,0 +1,13 @@
+.env
+.git
+.gitignore
+__pycache__/
+*.pyc
+audio_output/
+credentials.json
+firebase.json
+.firebaserc
+FIREBASE_HOSTING.md
+public/
+test_*.py
+test_ui.html

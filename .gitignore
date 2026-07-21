@@ -1,0 +1,7 @@
+.env
+vectordb/
+__pycache__/
+*.pyc
+*.json
+!firebase.json
+audio_output/
