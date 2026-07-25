@@ -206,6 +206,7 @@ def get_session(session_id: str) -> dict:
     return sessions.setdefault(session_id, {
         "user_name": "",
         "asked_name": False,
+        "introduced": False,
         "last_seen": time.time(),
     })
 
@@ -224,6 +225,34 @@ def add_name_to_answer(answer: str, user_name: str) -> str:
     if not user_name or answer.startswith(f"{user_name},"):
         return answer
     return f"{user_name}, {answer[:1].lower()}{answer[1:]}" if answer else answer
+
+def remove_repeated_intro(answer: str) -> str:
+    intro_markers = [
+        "Ben Data Koleji Ovacık Mesleki ve Teknik Anadolu Lisesi'nin resmi tanıtım robotuyum.",
+        "Ben Data Koleji Ovacik Mesleki ve Teknik Anadolu Lisesi'nin resmi tanitim robotuyum.",
+    ]
+    cleaned = answer.strip()
+    for marker in intro_markers:
+        if cleaned.startswith(marker):
+            cleaned = cleaned[len(marker):].strip()
+            break
+    followups = [
+        "Okulumuz hakkında talep ettiğiniz bilgileri aşağıda sunmaktan memnuniyet duyarım.",
+        "Okulumuz hakkinda talep ettiginiz bilgileri asagida sunmaktan memnuniyet duyarim.",
+    ]
+    for sentence in followups:
+        if cleaned.startswith(sentence):
+            cleaned = cleaned[len(sentence):].strip()
+            break
+    return cleaned or answer
+
+def is_positive_feedback(text: str) -> bool:
+    value = text.lower()
+    words = [
+        "tesekkur", "teşekkür", "sag ol", "sağ ol", "harika", "super", "süper",
+        "mukemmel", "mükemmel", "cok iyi", "çok iyi", "eline saglik", "eline sağlık",
+    ]
+    return any(word in value for word in words)
 
 def make_audio_response(answer: str, session_id: str = "", user_name: str = "", face_state: str = "", **extra) -> Answer:
     audio_path = ""
@@ -275,6 +304,11 @@ async def ask_question(question: Question):
         session["asked_name"] = True
         answer = "Merhaba, ben Data Koleji tanitim robotuyum. Sorunuzu yanitlamadan once size nasil hitap edebilirim?"
         return make_audio_response(answer, question.session_id)
+
+    user_name = session.get("user_name", "")
+    if is_positive_feedback(question.question):
+        answer = f"Rica ederim {user_name}. Yardimci olabildiysem ne mutlu bana."
+        return make_audio_response(answer, question.session_id, user_name, face_state="complimented")
 
     rag_engine = ensure_rag_engine()
     
@@ -355,8 +389,12 @@ async def ask_question(question: Question):
                 return Answer(answer=str(e), audio_path="")
 
         # Normal okul sorusu
-        user_name = session.get("user_name", "")
-        answer = add_name_to_answer(rag_engine.ask(question.question), user_name)
+        answer = rag_engine.ask(question.question)
+        if session.get("introduced"):
+            answer = remove_repeated_intro(answer)
+        else:
+            session["introduced"] = True
+        answer = add_name_to_answer(answer, user_name)
         
         audio_path = ""
         if tts_service:

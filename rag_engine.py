@@ -76,6 +76,7 @@ class RAGEngine:
 
 FORMATLAMA KURALLARI (MUTLAKA UYULMASI GEREKEN):
 1. Cevaplarını MUTLAKA Markdown formatında döndür
+1a. Kendini sadece ilk tanisma cevabinda tanit; takip eden cevaplarda dogrudan sorunun cevabina gec
 2. Giris cumlesinden sonra en fazla tek bos satir kullan
 3. Başlıkları numaralı ve BÜYÜK HARFLE yaz (örnek: 1. AKADEMİK BAŞARILAR)
 4. Basliktan hemen sonra metne gec; baslik ile paragraf arasinda bos satir birakma
@@ -83,7 +84,7 @@ FORMATLAMA KURALLARI (MUTLAKA UYULMASI GEREKEN):
 6. Madde işareti kullanma, akıcı paragraflar yaz
 
 ÖRNEK FORMAT:
-Ben Data Koleji Ovacık Mesleki ve Teknik Anadolu Lisesi'nin resmi tanıtım robotuyum. Okulumuz hakkında talep ettiğiniz bilgileri aşağıda sunmaktan memnuniyet duyarım.
+Ilk bilgi cevabinda kisa bir tanitim cumlesi kullanabilirsin. Takip eden cevaplarda bu cumleyi tekrar etme.
 
 Eğer sorulan bilgi mevcut değilse: "Bu konuda detaylı bilgiye sahip değilim. Daha fazla bilgi için lütfen okul yönetimi ile iletişime geçiniz."
 
