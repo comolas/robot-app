@@ -168,17 +168,63 @@
             border: 7px solid var(--text); border-radius: 50%;
             animation: faceBreath 3.4s ease-in-out infinite;
         }
-        .line-face::before,
-        .line-face::after {
-            content: ''; position: absolute; top: 34%; width: 14%; height: 14%;
+        .line-eye {
+            position: absolute; top: 34%; width: 18%; height: 18%;
             border: 6px solid var(--text); border-radius: 50%; background: var(--bg);
-            animation: blink 5s infinite;
+            animation: eyeBlink 5s infinite;
         }
-        .line-face::before { left: 27%; }
-        .line-face::after { right: 27%; }
+        .line-eye.left { left: 24%; }
+        .line-eye.right { right: 24%; }
+        .line-pupil {
+            position: absolute; left: 50%; top: 50%; width: 38%; height: 38%;
+            transform: translate(-50%, -50%); border-radius: 50%; background: var(--text);
+            animation: pupilLook 7s ease-in-out infinite;
+        }
+        .line-brow {
+            position: absolute; top: 25%; width: 18%; height: 8%;
+            border-top: 6px solid var(--text); border-radius: 50%;
+            opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .line-brow.left { left: 24%; transform: rotate(8deg); }
+        .line-brow.right { right: 24%; transform: rotate(-8deg); }
         .line-smile {
             position: absolute; left: 27%; right: 27%; bottom: 28%; height: 24%;
             border-bottom: 7px solid var(--text); border-radius: 0 0 999px 999px;
+        }
+        .line-cheek {
+            position: absolute; top: 57%; width: 15%; height: 8%; border-radius: 50%;
+            background: #f4a6b8; opacity: 0; filter: blur(0.2px);
+            transition: opacity 0.25s ease;
+        }
+        .line-cheek.left { left: 18%; }
+        .line-cheek.right { right: 18%; }
+        .line-face.is-happy .line-smile { bottom: 26%; height: 28%; }
+        .line-face.is-happy .line-brow { opacity: 1; transform: translateY(-5px); }
+        .line-face.is-sleepy .line-eye {
+            height: 4%; border-left: 0; border-right: 0; border-bottom: 0;
+            border-radius: 0; animation: none; top: 41%; background: transparent;
+        }
+        .line-face.is-sleepy .line-pupil { display: none; }
+        .line-face.is-sleepy .line-smile { left: 38%; right: 38%; height: 8%; bottom: 29%; }
+        .line-face.is-low-battery .line-smile {
+            left: 38%; right: 38%; height: 12%; bottom: 26%;
+            border-bottom: 0; border-top: 7px solid var(--text); border-radius: 999px 999px 0 0;
+        }
+        .line-face.is-low-battery .line-brow { opacity: 1; }
+        .line-face.is-low-battery .line-brow.left { transform: rotate(-16deg); }
+        .line-face.is-low-battery .line-brow.right { transform: rotate(16deg); }
+        .line-face.is-complimented .line-cheek,
+        .line-face.is-petted .line-cheek { opacity: 0.72; }
+        .line-face.is-petted { animation: petWiggle 0.8s ease-in-out 2, faceBreath 3.4s ease-in-out infinite; }
+        .line-face.is-petted .line-eye { transform: rotate(-10deg); }
+        .line-face.is-petted .line-smile { bottom: 25%; height: 31%; }
+        .face-state-buttons {
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+            max-width: 520px;
+        }
+        .face-state-buttons button {
+            border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card);
+            color: var(--text); padding: 8px 10px; cursor: pointer; font-size: 14px;
         }
         .idle-title {
             margin: 0; font-size: clamp(28px, 5vw, 48px); font-weight: 700;
@@ -190,13 +236,23 @@
             cursor: pointer; box-shadow: 0 10px 24px rgba(0,0,0,0.18);
         }
         .idle-action:active { transform: translateY(1px); }
-        @keyframes blink {
+        @keyframes eyeBlink {
             0%, 47%, 51%, 100% { transform: scaleY(1); }
             49% { transform: scaleY(0.08); }
+        }
+        @keyframes pupilLook {
+            0%, 70%, 100% { transform: translate(-50%, -50%); }
+            78% { transform: translate(-32%, -50%); }
+            86% { transform: translate(-68%, -50%); }
         }
         @keyframes faceBreath {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-5px) scale(1.015); }
+        }
+        @keyframes petWiggle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            30% { transform: rotate(-4deg) scale(1.02); }
+            65% { transform: rotate(4deg) scale(1.02); }
         }
         details { margin: 10px 0; border: 1px solid var(--border-soft); border-radius: 6px; }
         details summary { cursor: pointer; font-weight: 500; padding: 10px 14px; list-style: none; color: var(--text); }
@@ -400,8 +456,22 @@
 </head>
 <body>
     <section id="idleScreen" aria-label="Karşılama ekranı">
-        <div class="line-face" aria-hidden="true"><div class="line-smile"></div></div>
+        <div id="idleFace" class="line-face is-happy" aria-hidden="true" onclick="setIdleFace('petted', 2500)">
+            <div class="line-brow left"></div>
+            <div class="line-brow right"></div>
+            <div class="line-eye left"><span class="line-pupil"></span></div>
+            <div class="line-eye right"><span class="line-pupil"></span></div>
+            <div class="line-cheek left"></div>
+            <div class="line-cheek right"></div>
+            <div class="line-smile"></div>
+        </div>
         <p class="idle-title">Merhaba</p>
+        <div class="face-state-buttons" aria-label="Yüz ifadeleri">
+            <button type="button" onclick="setIdleFace('happy')">Mutlu</button>
+            <button type="button" onclick="setIdleFace('charging')">Şarj</button>
+            <button type="button" onclick="setIdleFace('low-battery')">Düşük Pil</button>
+            <button type="button" onclick="setIdleFace('complimented', 3000)">İltifat</button>
+        </div>
         <button class="idle-action" onclick="openApp()">BİLGİ AL</button>
     </section>
     <main id="appShell" aria-hidden="true">
@@ -642,6 +712,20 @@
             idleTimer = setTimeout(showIdleScreen, IDLE_TIMEOUT_MS);
         }
 
+        function setIdleFace(state = 'happy', durationMs = 0) {
+            const face = document.getElementById('idleFace');
+            if (!face) return;
+            const states = ['happy', 'charging', 'low-battery', 'complimented', 'petted', 'sleepy'];
+            states.forEach(item => face.classList.remove(`is-${item}`));
+            const next = state === 'charging' ? 'sleepy' : state;
+            face.classList.remove('is-sleepy');
+            face.classList.add(`is-${next}`);
+            if (durationMs > 0) {
+                clearTimeout(face._stateTimer);
+                face._stateTimer = setTimeout(() => setIdleFace('happy'), durationMs);
+            }
+        }
+
         function clearActiveOutputs() {
             const ids = ['answer', 'pdfViewer', 'simSection', 'pronSection', 'simplifySection', 'quizSection', 'vocabSection', 'dialogueSection', 'reportSection', 'faceBar'];
             ids.forEach(id => {
@@ -659,6 +743,7 @@
             clearTimeout(idleTimer);
             resetSession();
             clearActiveOutputs();
+            setIdleFace('happy');
             const idle = document.getElementById('idleScreen');
             const shell = document.getElementById('appShell');
             if (idle) idle.classList.remove('hidden');
