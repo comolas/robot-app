@@ -154,6 +154,50 @@
         .sk-row   { display: flex; gap: 10px; margin: 10px 0; }
         .sk-row .sk { flex: 1; height: 16px; }
         .skeleton-wrap { padding: 20px; background: var(--result-bg); border-radius: 8px; margin-top: 20px; border: 1px solid var(--border-soft); }
+        #idleScreen {
+            position: fixed; inset: 0; z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 28px; padding: 24px; background: var(--bg); color: var(--text);
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        #idleScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        #appShell { display: none; }
+        #appShell.active { display: block; }
+        .line-face {
+            width: min(52vw, 320px); aspect-ratio: 1; position: relative;
+            border: 7px solid var(--text); border-radius: 50%;
+            animation: faceBreath 3.4s ease-in-out infinite;
+        }
+        .line-face::before,
+        .line-face::after {
+            content: ''; position: absolute; top: 34%; width: 14%; height: 14%;
+            border: 6px solid var(--text); border-radius: 50%; background: var(--bg);
+            animation: blink 5s infinite;
+        }
+        .line-face::before { left: 27%; }
+        .line-face::after { right: 27%; }
+        .line-smile {
+            position: absolute; left: 27%; right: 27%; bottom: 28%; height: 24%;
+            border-bottom: 7px solid var(--text); border-radius: 0 0 999px 999px;
+        }
+        .idle-title {
+            margin: 0; font-size: clamp(28px, 5vw, 48px); font-weight: 700;
+            text-align: center;
+        }
+        .idle-action {
+            width: min(78vw, 340px); min-height: 72px; border: 0; border-radius: 8px;
+            background: #1e1b4b; color: #fff; font-size: 26px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+        }
+        .idle-action:active { transform: translateY(1px); }
+        @keyframes blink {
+            0%, 47%, 51%, 100% { transform: scaleY(1); }
+            49% { transform: scaleY(0.08); }
+        }
+        @keyframes faceBreath {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.015); }
+        }
         details { margin: 10px 0; border: 1px solid var(--border-soft); border-radius: 6px; }
         details summary { cursor: pointer; font-weight: 500; padding: 10px 14px; list-style: none; color: var(--text); }
         details summary::-webkit-details-marker { display: none; }
@@ -355,6 +399,12 @@
     </style>
 </head>
 <body>
+    <section id="idleScreen" aria-label="Karşılama ekranı">
+        <div class="line-face" aria-hidden="true"><div class="line-smile"></div></div>
+        <p class="idle-title">Merhaba</p>
+        <button class="idle-action" onclick="openApp()">BİLGİ AL</button>
+    </section>
+    <main id="appShell" aria-hidden="true">
     <button id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
     <h1><a href="" onclick="location.reload(); return false;" style="text-decoration:none; color:inherit;"><img src="https://r.resimlink.com/fwISR.jpg" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"></a>Data Koleji Okul Tanıtım Robotu</h1>
 
@@ -558,6 +608,7 @@
     <div id="galleryOverlay" class="gallery-overlay" onclick="this.style.display='none'">
         <img id="galleryFullImg" src="" alt="" />
     </div>
+    </main>
 
     <script>
         const API = window.APP_CONFIG.apiBaseUrl;
@@ -569,8 +620,76 @@
         let currentLanguage = 'en';
         let pdfState = { name: '', page: 0, totalPages: 0 };
         const SESSION_ID_KEY = 'robot_session_id';
-        const SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || crypto.randomUUID();
+        const IDLE_TIMEOUT_MS = 60000;
+        let idleTimer = null;
+        let appIsOpen = false;
+        let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
+
+        function createSessionId() {
+            if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+            return `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
+
+        function resetSession() {
+            SESSION_ID = createSessionId();
+            localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
+        }
+
+        function resetIdleTimer() {
+            if (!appIsOpen) return;
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(showIdleScreen, IDLE_TIMEOUT_MS);
+        }
+
+        function clearActiveOutputs() {
+            const ids = ['answer', 'pdfViewer', 'simSection', 'pronSection', 'simplifySection', 'quizSection', 'vocabSection', 'dialogueSection', 'reportSection', 'faceBar'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            const q = document.getElementById('question');
+            if (q) q.value = '';
+            const voiceStatus = document.getElementById('voiceStatus');
+            if (voiceStatus) voiceStatus.style.display = 'none';
+        }
+
+        function showIdleScreen() {
+            appIsOpen = false;
+            clearTimeout(idleTimer);
+            resetSession();
+            clearActiveOutputs();
+            const idle = document.getElementById('idleScreen');
+            const shell = document.getElementById('appShell');
+            if (idle) idle.classList.remove('hidden');
+            if (shell) {
+                shell.classList.remove('active');
+                shell.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        async function openApp() {
+            appIsOpen = true;
+            const idle = document.getElementById('idleScreen');
+            const shell = document.getElementById('appShell');
+            if (idle) idle.classList.add('hidden');
+            if (shell) {
+                shell.classList.add('active');
+                shell.setAttribute('aria-hidden', 'false');
+            }
+            resetIdleTimer();
+            try {
+                const response = await fetch(`${API}/session/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: SESSION_ID })
+                });
+                const data = await response.json();
+                if (data.audio_path) new Audio(`${API}${data.audio_path}`).play().catch(() => {});
+            } catch (e) {}
+            const q = document.getElementById('question');
+            if (q) q.focus();
+        }
 
         // ── TEMA YÖNETİMİ ──
         function toggleTheme() {
@@ -589,6 +708,10 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
                 if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+                showIdleScreen();
+                ['click', 'keydown', 'touchstart', 'mousemove'].forEach(type => {
+                    document.addEventListener(type, resetIdleTimer, { passive: true });
+                });
             });
         })();
 
