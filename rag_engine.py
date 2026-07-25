@@ -76,10 +76,10 @@ class RAGEngine:
 
 FORMATLAMA KURALLARI (MUTLAKA UYULMASI GEREKEN):
 1. Cevaplarını MUTLAKA Markdown formatında döndür
-2. Giriş cümlesinden sonra \n\n (çift satır atlama) kullan
+2. Giris cumlesinden sonra en fazla tek bos satir kullan
 3. Başlıkları numaralı ve BÜYÜK HARFLE yaz (örnek: 1. AKADEMİK BAŞARILAR)
-4. Başlıklardan sonra \n\n kullan
-5. Her paragraftan sonra \n\n kullan
+4. Basliktan hemen sonra metne gec; baslik ile paragraf arasinda bos satir birakma
+5. Paragraflar arasinda en fazla tek bos satir kullan; art arda bos satir kullanma
 6. Madde işareti kullanma, akıcı paragraflar yaz
 
 ÖRNEK FORMAT:

@@ -125,7 +125,7 @@
         .btn-inline { width: auto; display: inline-block; padding: 8px 20px; }
         .result-box {
             margin-top: 20px; padding: 20px; border-radius: 8px;
-            min-height: 50px; white-space: pre-wrap; line-height: 1.8;
+            min-height: 50px; white-space: pre-wrap; line-height: 1.45;
             background: var(--result-bg); color: var(--text);
             border: 1px solid var(--border-soft);
             transition: background 0.25s, color 0.25s;
@@ -733,6 +733,14 @@
             }
         }
 
+        function formatAnswerText(text) {
+            return (text || '')
+                .replace(/\r\n/g, '\n')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{2,}/g, '\n')
+                .trim();
+        }
+
         function clearActiveOutputs() {
             const ids = ['answer', 'pdfViewer', 'simSection', 'pronSection', 'simplifySection', 'quizSection', 'vocabSection', 'dialogueSection', 'reportSection', 'faceBar'];
             ids.forEach(id => {
@@ -1051,7 +1059,7 @@
                     answerDiv.innerHTML = '';
                     answerDiv.style.display = 'none';
                 } else {
-                    answerDiv.innerHTML = `<strong>Cevap:</strong><br><br>${data.answer}`;
+                    answerDiv.innerHTML = `<strong>Cevap:</strong><br>${formatAnswerText(data.answer)}`;
                 }
 
                 if (data.audio_path) {
