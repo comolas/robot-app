@@ -568,6 +568,9 @@
         let currentPageText = '';
         let currentLanguage = 'en';
         let pdfState = { name: '', page: 0, totalPages: 0 };
+        const SESSION_ID_KEY = 'robot_session_id';
+        const SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || crypto.randomUUID();
+        localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
 
         // ── TEMA YÖNETİMİ ──
         function toggleTheme() {
@@ -791,7 +794,7 @@
                 const response = await fetch(`${API}/ask`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question })
+                    body: JSON.stringify({ question, session_id: SESSION_ID })
                 });
                 const data = await response.json();
 

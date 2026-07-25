@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import asyncio
 from contextlib import asynccontextmanager
@@ -48,8 +49,6 @@ load_dotenv(override=True)
 
 @asynccontextmanager
 async def lifespan(app):
-    """Uygulama başlarken RAG engine'i yükle"""
-    global rag_engine
     cleanup_audio()
     asyncio.create_task(_periodic_cleanup())
     yield
@@ -166,6 +165,11 @@ except Exception as e:
 
 class Question(BaseModel):
     question: str
+    session_id: str = "default"
+    user_name: str = ""
+
+class SessionStart(BaseModel):
+    session_id: str = "default"
 
 # WebScraper (galeri cache icin global)
 _web_scraper_instance = None
@@ -181,6 +185,8 @@ def get_web_scraper():
 class Answer(BaseModel):
     answer: str
     audio_path: str
+    session_id: str = ""
+    user_name: str = ""
     questions: list[str] = []
     answers: list[str] = []
     question_audio_paths: list[str] = []
@@ -192,11 +198,72 @@ class EvaluateRequest(BaseModel):
     audio_path: str
     student_name: str
 
+sessions: dict[str, dict] = {}
+
+def get_session(session_id: str) -> dict:
+    session_id = session_id or "default"
+    return sessions.setdefault(session_id, {
+        "user_name": "",
+        "asked_name": False,
+        "last_seen": time.time(),
+    })
+
+def extract_user_name(text: str) -> str:
+    patterns = [
+        r"\b(?:benim adim|benim adım|adim|adım|ismim|ben)\s+([A-Za-zÇĞİÖŞÜçğıöşü]{2,30})\b",
+        r"\bbana\s+([A-Za-zÇĞİÖŞÜçğıöşü]{2,30})\s+(?:de|diyebilirsin|diyin)\b",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text.strip(), flags=re.IGNORECASE)
+        if match:
+            return match.group(1).strip().title()
+    return ""
+
+def add_name_to_answer(answer: str, user_name: str) -> str:
+    if not user_name or answer.startswith(f"{user_name},"):
+        return answer
+    return f"{user_name}, {answer[:1].lower()}{answer[1:]}" if answer else answer
+
+def make_audio_response(answer: str, session_id: str = "", user_name: str = "", **extra) -> Answer:
+    audio_path = ""
+    if tts_service:
+        cached_path = tts_service.text_to_speech(answer)
+        audio_path = f"/audio/{Path(cached_path).name}"
+    return Answer(answer=answer, audio_path=audio_path, session_id=session_id, user_name=user_name, **extra)
+
+@app.post("/session/start", response_model=Answer)
+async def start_session(req: SessionStart):
+    session = get_session(req.session_id)
+    session["asked_name"] = True
+    session["last_seen"] = time.time()
+    user_name = session.get("user_name", "")
+    if user_name:
+        answer = f"Tekrar merhaba {user_name}. Okulumuz hakkında ne öğrenmek istersin?"
+    else:
+        answer = "Merhaba, ben Data Koleji tanıtım robotuyum. Size nasıl hitap edebilirim?"
+    return make_audio_response(answer, req.session_id, user_name)
+
 
 @app.post("/ask", response_model=Answer)
 async def ask_question(question: Question):
     """Arduino'dan gelen soruyu yanıtla"""
     global rag_engine
+    session = get_session(question.session_id)
+    session["last_seen"] = time.time()
+
+    provided_name = question.user_name.strip().title() if question.user_name else ""
+    detected_name = provided_name or extract_user_name(question.question)
+    if detected_name:
+        session["user_name"] = detected_name
+        session["asked_name"] = True
+        answer = f"Memnun oldum {detected_name}. Okulumuz hakkinda ne ogrenmek istersin?"
+        return make_audio_response(answer, question.session_id, detected_name)
+
+    if not session.get("user_name"):
+        session["asked_name"] = True
+        answer = "Merhaba, ben Data Koleji tanitim robotuyum. Sorunuzu yanitlamadan once size nasil hitap edebilirim?"
+        return make_audio_response(answer, question.session_id)
+
     rag_engine = ensure_rag_engine()
     
     try:
@@ -276,14 +343,15 @@ async def ask_question(question: Question):
                 return Answer(answer=str(e), audio_path="")
 
         # Normal okul sorusu
-        answer = rag_engine.ask(question.question)
+        user_name = session.get("user_name", "")
+        answer = add_name_to_answer(rag_engine.ask(question.question), user_name)
         
         audio_path = ""
         if tts_service:
             cached_path = tts_service.text_to_speech(answer)
             audio_path = f"/audio/{Path(cached_path).name}"
         
-        return Answer(answer=answer, audio_path=audio_path)
+        return Answer(answer=answer, audio_path=audio_path, session_id=question.session_id, user_name=user_name)
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
