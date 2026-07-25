@@ -47,3 +47,42 @@ Sonraki soru:
   "question": "Okul hakkinda bilgi verir misin?"
 }
 ```
+
+## Kafa sevme / dokunma algilama
+
+Robotun kafasina kapasitif dokunma sensoru eklenirse Raspberry Pi backend'e su endpoint ile haber verir:
+
+```text
+POST /robot/touch/head
+```
+
+Backend su anlamda bir cevap dondurur:
+
+```text
+Beni mutlu ettiniz. Tesekkur ederim.
+```
+
+Kullanici adi biliniyorsa cevap isme gore kisilesir.
+
+Ornek GPIO script'i:
+
+```bash
+pip install gpiozero requests
+python raspberry_pi_head_touch.py
+```
+
+Varsayilan pin:
+
+```text
+GPIO17
+```
+
+Kapasitif dokunma sensoru icin tipik baglanti:
+
+```text
+VCC -> 3.3V
+GND -> GND
+OUT -> GPIO17
+```
+
+Endpoint cevabinda `face_state` alani `complimented` olarak gelir. Pi uzerindeki ekran bu degeri gorunce iltifat/kizarma yuzunu 5 saniye gosterebilir.

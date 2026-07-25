@@ -187,6 +187,7 @@ class Answer(BaseModel):
     audio_path: str
     session_id: str = ""
     user_name: str = ""
+    face_state: str = ""
     questions: list[str] = []
     answers: list[str] = []
     question_audio_paths: list[str] = []
@@ -224,12 +225,12 @@ def add_name_to_answer(answer: str, user_name: str) -> str:
         return answer
     return f"{user_name}, {answer[:1].lower()}{answer[1:]}" if answer else answer
 
-def make_audio_response(answer: str, session_id: str = "", user_name: str = "", **extra) -> Answer:
+def make_audio_response(answer: str, session_id: str = "", user_name: str = "", face_state: str = "", **extra) -> Answer:
     audio_path = ""
     if tts_service:
         cached_path = tts_service.text_to_speech(answer)
         audio_path = f"/audio/{Path(cached_path).name}"
-    return Answer(answer=answer, audio_path=audio_path, session_id=session_id, user_name=user_name, **extra)
+    return Answer(answer=answer, audio_path=audio_path, session_id=session_id, user_name=user_name, face_state=face_state, **extra)
 
 @app.post("/session/start", response_model=Answer)
 async def start_session(req: SessionStart):
@@ -242,6 +243,17 @@ async def start_session(req: SessionStart):
     else:
         answer = "Merhaba, ben Data Koleji tanıtım robotuyum. Size nasıl hitap edebilirim?"
     return make_audio_response(answer, req.session_id, user_name)
+
+@app.post("/robot/touch/head", response_model=Answer)
+async def head_touch(req: SessionStart):
+    session = get_session(req.session_id)
+    session["last_seen"] = time.time()
+    user_name = session.get("user_name", "")
+    if user_name:
+        answer = f"{user_name}, beni mutlu ettiniz. Teşekkür ederim."
+    else:
+        answer = "Beni mutlu ettiniz. Teşekkür ederim."
+    return make_audio_response(answer, req.session_id, user_name, face_state="complimented")
 
 
 @app.post("/ask", response_model=Answer)
