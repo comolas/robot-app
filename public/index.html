@@ -477,7 +477,7 @@
         <p id="presenceStatus" class="presence-status">Kamera hazırlanıyor...</p>
         <button class="idle-action" onclick="openApp()">BİLGİ AL</button>
         <video id="presenceVideo" class="presence-camera" autoplay muted playsinline></video>
-        <canvas id="presenceCanvas" class="presence-camera" width="160" height="90"></canvas>
+        <canvas id="presenceCanvas" class="presence-camera" width="240" height="135"></canvas>
     </section>
     <main id="appShell" aria-hidden="true">
     <button id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
@@ -697,13 +697,15 @@
         const SESSION_ID_KEY = 'robot_session_id';
         const IDLE_TIMEOUT_MS = 60000;
         const PRESENCE_COOLDOWN_MS = 30000;
-        const PRESENCE_SCORE_THRESHOLD = 14;
+        const PRESENCE_SCORE_THRESHOLD = 5.5;
+        const PRESENCE_FRAMES_REQUIRED = 3;
         let idleTimer = null;
         let appIsOpen = false;
         let presenceStream = null;
         let presenceLastFrame = null;
         let presenceLastGreetingAt = 0;
         let presenceLoopStarted = false;
+        let presenceMotionFrames = 0;
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
 
@@ -739,7 +741,7 @@
             if (presenceStream || !navigator.mediaDevices?.getUserMedia) return;
             try {
                 presenceStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: 320, height: 180 },
+                    video: { facingMode: 'user', width: 640, height: 360 },
                     audio: false
                 });
                 const video = document.getElementById('presenceVideo');
@@ -778,8 +780,15 @@
             presenceLastFrame = new Uint8ClampedArray(frame);
 
             const now = Date.now();
-            if (!appIsOpen && score > PRESENCE_SCORE_THRESHOLD && now - presenceLastGreetingAt > PRESENCE_COOLDOWN_MS) {
+            if (score > PRESENCE_SCORE_THRESHOLD) {
+                presenceMotionFrames += 1;
+            } else {
+                presenceMotionFrames = Math.max(0, presenceMotionFrames - 1);
+            }
+
+            if (!appIsOpen && presenceMotionFrames >= PRESENCE_FRAMES_REQUIRED && now - presenceLastGreetingAt > PRESENCE_COOLDOWN_MS) {
                 presenceLastGreetingAt = now;
+                presenceMotionFrames = 0;
                 greetDetectedVisitor();
             }
             requestAnimationFrame(checkPresenceFrame);
