@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 
@@ -699,6 +701,8 @@
         const PRESENCE_COOLDOWN_MS = 30000;
         const PRESENCE_SCORE_THRESHOLD = 2.2;
         const PRESENCE_FRAMES_REQUIRED = 1;
+        const PERSON_SCORE_THRESHOLD = 0.55;
+        const PERSON_DETECTION_INTERVAL_MS = 700;
         let idleTimer = null;
         let appIsOpen = false;
         let presenceStream = null;
@@ -707,6 +711,11 @@
         let presenceLastStatusAt = 0;
         let presenceLoopStarted = false;
         let presenceMotionFrames = 0;
+        let personModel = null;
+        let personModelReady = false;
+        let personModelFailed = false;
+        let personDetectionBusy = false;
+        let lastPersonDetectionAt = 0;
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
 
@@ -738,6 +747,24 @@
             if (el) el.textContent = message;
         }
 
+        async function loadPersonModel() {
+            if (personModelReady || personModelFailed || personModel) return;
+            if (!window.cocoSsd) {
+                personModelFailed = true;
+                setPresenceStatus('İnsan algılama modeli yüklenemedi. Hareket algılama yedekte.');
+                return;
+            }
+            try {
+                setPresenceStatus('İnsan algılama modeli yükleniyor...');
+                personModel = await cocoSsd.load();
+                personModelReady = true;
+                setPresenceStatus('İnsan algılama aktif.');
+            } catch (e) {
+                personModelFailed = true;
+                setPresenceStatus('İnsan algılama modeli yüklenemedi. Hareket algılama yedekte.');
+            }
+        }
+
         async function startPresenceCamera() {
             if (presenceStream || !navigator.mediaDevices?.getUserMedia) return;
             try {
@@ -750,7 +777,8 @@
                     video.srcObject = presenceStream;
                     await video.play().catch(() => {});
                 }
-                setPresenceStatus('Sizi fark ettiğimde selam vereceğim.');
+                setPresenceStatus('Kamera aktif. Insan algilama hazirlaniyor...');
+                loadPersonModel();
                 if (!presenceLoopStarted) {
                     presenceLoopStarted = true;
                     requestAnimationFrame(checkPresenceFrame);
@@ -787,11 +815,16 @@
             presenceLastFrame = new Uint8ClampedArray(frame);
 
             const now = Date.now();
+            if (personModelReady && now - lastPersonDetectionAt > PERSON_DETECTION_INTERVAL_MS) {
+                lastPersonDetectionAt = now;
+                detectPersonInFrame(video);
+            }
             if (!appIsOpen && now - presenceLastStatusAt > 1000) {
                 presenceLastStatusAt = now;
-                setPresenceStatus(`Kamera aktif. Hareket seviyesi: ${score.toFixed(1)}`);
+                const mode = personModelReady ? 'İnsan algılama aktif' : 'Hareket algılama yedekte';
+                setPresenceStatus(`${mode}. Hareket seviyesi: ${score.toFixed(1)}`);
             }
-            if (score > PRESENCE_SCORE_THRESHOLD) {
+            if (personModelFailed && score > PRESENCE_SCORE_THRESHOLD) {
                 presenceMotionFrames = PRESENCE_FRAMES_REQUIRED;
             } else {
                 presenceMotionFrames = Math.max(0, presenceMotionFrames - 1);
@@ -803,6 +836,25 @@
                 greetDetectedVisitor();
             }
             requestAnimationFrame(checkPresenceFrame);
+        }
+
+        async function detectPersonInFrame(video) {
+            if (personDetectionBusy || appIsOpen || !personModelReady || !personModel) return;
+            personDetectionBusy = true;
+            try {
+                const predictions = await personModel.detect(video);
+                const person = predictions.find(item => item.class === 'person' && item.score >= PERSON_SCORE_THRESHOLD);
+                if (person && Date.now() - presenceLastGreetingAt > PRESENCE_COOLDOWN_MS) {
+                    presenceLastGreetingAt = Date.now();
+                    setPresenceStatus(`İnsan algılandı (${Math.round(person.score * 100)}%).`);
+                    greetDetectedVisitor();
+                }
+            } catch (e) {
+                personModelFailed = true;
+                setPresenceStatus('İnsan algılama durdu. Hareket algılama yedekte.');
+            } finally {
+                personDetectionBusy = false;
+            }
         }
 
         async function greetDetectedVisitor() {

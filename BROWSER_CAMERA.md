@@ -49,5 +49,7 @@ msedge --kiosk https://YOUR_FIREBASE_HOSTING_URL --edge-kiosk-type=fullscreen
 ## Notlar
 
 - Kamera izni olmadan web sitesi kamerayi acamaz.
-- Algilama goruntu kareleri arasindaki hareket farkina gore yapilir; goruntu sunucuya gonderilmez.
-- Daha hassas insan algilama gerekirse sonraki adimda TensorFlow.js veya MediaPipe eklenebilir.
+- Algilama oncelikle TensorFlow.js + COCO-SSD ile `person` sinifina gore yapilir.
+- Kamera goruntusu sunucuya gonderilmez; model tarayici icinde calisir.
+- COCO-SSD modeli yuklenemezse eski hareket algilama yedek olarak devreye girer.
+- `person` algilama guven esigi arayuz kodunda `PERSON_SCORE_THRESHOLD` degeriyle ayarlanir.
