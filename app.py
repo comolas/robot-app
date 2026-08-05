@@ -170,6 +170,7 @@ class Question(BaseModel):
 
 class SessionStart(BaseModel):
     session_id: str = "default"
+    greeting_type: str = ""
 
 # WebScraper (galeri cache icin global)
 _web_scraper_instance = None
@@ -267,7 +268,9 @@ async def start_session(req: SessionStart):
     session["asked_name"] = True
     session["last_seen"] = time.time()
     user_name = session.get("user_name", "")
-    if user_name:
+    if req.greeting_type == "presence":
+        answer = "Merhaba, okulumuza hos geldiniz. Bilgi almak icin Bilgi Al butonuna tiklayabilirsiniz."
+    elif user_name:
         answer = f"Tekrar merhaba {user_name}. Okulumuz hakkında ne öğrenmek istersin?"
     else:
         answer = "Merhaba, ben Data Koleji tanıtım robotuyum. Size nasıl hitap edebilirim?"

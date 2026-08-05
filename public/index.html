@@ -236,6 +236,14 @@
             outline: none;
         }
         .idle-action:active { transform: translateY(1px); }
+        .presence-status {
+            min-height: 22px; margin: -12px 0 0; font-size: 15px;
+            color: var(--text-muted); text-align: center;
+        }
+        .presence-camera {
+            position: fixed; width: 1px; height: 1px; opacity: 0;
+            pointer-events: none; left: -10px; top: -10px;
+        }
         @keyframes eyeBlink {
             0%, 47%, 51%, 100% { transform: scaleY(1); }
             49% { transform: scaleY(0.08); }
@@ -466,7 +474,10 @@
             <div class="line-smile"></div>
         </div>
         <p class="idle-title">Hoş Geldiniz</p>
+        <p id="presenceStatus" class="presence-status">Kamera hazırlanıyor...</p>
         <button class="idle-action" onclick="openApp()">BİLGİ AL</button>
+        <video id="presenceVideo" class="presence-camera" autoplay muted playsinline></video>
+        <canvas id="presenceCanvas" class="presence-camera" width="160" height="90"></canvas>
     </section>
     <main id="appShell" aria-hidden="true">
     <button id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
@@ -685,8 +696,14 @@
         let pdfState = { name: '', page: 0, totalPages: 0 };
         const SESSION_ID_KEY = 'robot_session_id';
         const IDLE_TIMEOUT_MS = 60000;
+        const PRESENCE_COOLDOWN_MS = 30000;
+        const PRESENCE_SCORE_THRESHOLD = 14;
         let idleTimer = null;
         let appIsOpen = false;
+        let presenceStream = null;
+        let presenceLastFrame = null;
+        let presenceLastGreetingAt = 0;
+        let presenceLoopStarted = false;
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
 
@@ -704,6 +721,97 @@
             if (!appIsOpen) return;
             clearTimeout(idleTimer);
             idleTimer = setTimeout(showIdleScreen, IDLE_TIMEOUT_MS);
+        }
+
+        async function requestFullscreenMode() {
+            if (document.fullscreenElement) return;
+            try {
+                await document.documentElement.requestFullscreen();
+            } catch (e) {}
+        }
+
+        function setPresenceStatus(message) {
+            const el = document.getElementById('presenceStatus');
+            if (el) el.textContent = message;
+        }
+
+        async function startPresenceCamera() {
+            if (presenceStream || !navigator.mediaDevices?.getUserMedia) return;
+            try {
+                presenceStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: 320, height: 180 },
+                    audio: false
+                });
+                const video = document.getElementById('presenceVideo');
+                if (video) {
+                    video.srcObject = presenceStream;
+                    await video.play().catch(() => {});
+                }
+                setPresenceStatus('Sizi fark ettiğimde selam vereceğim.');
+                if (!presenceLoopStarted) {
+                    presenceLoopStarted = true;
+                    requestAnimationFrame(checkPresenceFrame);
+                }
+            } catch (e) {
+                setPresenceStatus('Kamera izni verilirse sizi karşılayabilirim.');
+            }
+        }
+
+        function checkPresenceFrame() {
+            const video = document.getElementById('presenceVideo');
+            const canvas = document.getElementById('presenceCanvas');
+            const ctx = canvas?.getContext('2d', { willReadFrequently: true });
+            if (!video || !canvas || !ctx || video.readyState < 2) {
+                requestAnimationFrame(checkPresenceFrame);
+                return;
+            }
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const frame = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let score = 0;
+            if (presenceLastFrame) {
+                for (let i = 0; i < frame.length; i += 16) {
+                    score += Math.abs(frame[i] - presenceLastFrame[i]);
+                }
+                score = score / (frame.length / 16);
+            }
+            presenceLastFrame = new Uint8ClampedArray(frame);
+
+            const now = Date.now();
+            if (!appIsOpen && score > PRESENCE_SCORE_THRESHOLD && now - presenceLastGreetingAt > PRESENCE_COOLDOWN_MS) {
+                presenceLastGreetingAt = now;
+                greetDetectedVisitor();
+            }
+            requestAnimationFrame(checkPresenceFrame);
+        }
+
+        async function greetDetectedVisitor() {
+            setIdleFace('happy', 5000);
+            setPresenceStatus('Merhaba, okulumuza hoş geldiniz.');
+            try {
+                const response = await fetch(`${API}/session/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: SESSION_ID, greeting_type: 'presence' })
+                });
+                const data = await response.json();
+                const greetingText = 'Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.';
+                if (data.audio_path) {
+                    new Audio(`${API}${data.audio_path}`).play().catch(() => speakLocalGreeting(greetingText));
+                } else {
+                    speakLocalGreeting(greetingText);
+                }
+            } catch (e) {
+                speakLocalGreeting('Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.');
+            }
+        }
+
+        function speakLocalGreeting(text) {
+            if (!window.speechSynthesis) return;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'tr-TR';
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
         }
 
         function setIdleFace(state = 'happy', durationMs = 0) {
@@ -770,6 +878,7 @@
 
         async function openApp() {
             appIsOpen = true;
+            requestFullscreenMode();
             const idle = document.getElementById('idleScreen');
             const shell = document.getElementById('appShell');
             if (idle) idle.classList.add('hidden');
@@ -809,6 +918,8 @@
                 const btn = document.getElementById('themeToggle');
                 if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
                 showIdleScreen();
+                startPresenceCamera();
+                requestFullscreenMode();
                 ['click', 'keydown', 'touchstart', 'mousemove'].forEach(type => {
                     document.addEventListener(type, resetIdleTimer, { passive: true });
                 });
