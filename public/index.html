@@ -698,7 +698,7 @@
         const IDLE_TIMEOUT_MS = 60000;
         const PRESENCE_COOLDOWN_MS = 30000;
         const PRESENCE_SCORE_THRESHOLD = 2.2;
-        const PRESENCE_FRAMES_REQUIRED = 2;
+        const PRESENCE_FRAMES_REQUIRED = 1;
         let idleTimer = null;
         let appIsOpen = false;
         let presenceStream = null;
@@ -792,7 +792,7 @@
                 setPresenceStatus(`Kamera aktif. Hareket seviyesi: ${score.toFixed(1)}`);
             }
             if (score > PRESENCE_SCORE_THRESHOLD) {
-                presenceMotionFrames += 1;
+                presenceMotionFrames = PRESENCE_FRAMES_REQUIRED;
             } else {
                 presenceMotionFrames = Math.max(0, presenceMotionFrames - 1);
             }
@@ -808,22 +808,16 @@
         async function greetDetectedVisitor() {
             setIdleFace('happy', 5000);
             setPresenceStatus('Merhaba, okulumuza hoş geldiniz.');
+            const greetingText = 'Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.';
+            speakLocalGreeting(greetingText);
             try {
                 const response = await fetch(`${API}/session/start`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: SESSION_ID, greeting_type: 'presence' })
                 });
-                const data = await response.json();
-                const greetingText = 'Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.';
-                if (data.audio_path) {
-                    new Audio(`${API}${data.audio_path}`).play().catch(() => speakLocalGreeting(greetingText));
-                } else {
-                    speakLocalGreeting(greetingText);
-                }
-            } catch (e) {
-                speakLocalGreeting('Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.');
-            }
+                await response.json();
+            } catch (e) {}
         }
 
         function speakLocalGreeting(text) {
