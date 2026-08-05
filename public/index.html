@@ -697,13 +697,14 @@
         const SESSION_ID_KEY = 'robot_session_id';
         const IDLE_TIMEOUT_MS = 60000;
         const PRESENCE_COOLDOWN_MS = 30000;
-        const PRESENCE_SCORE_THRESHOLD = 5.5;
-        const PRESENCE_FRAMES_REQUIRED = 3;
+        const PRESENCE_SCORE_THRESHOLD = 2.2;
+        const PRESENCE_FRAMES_REQUIRED = 2;
         let idleTimer = null;
         let appIsOpen = false;
         let presenceStream = null;
         let presenceLastFrame = null;
         let presenceLastGreetingAt = 0;
+        let presenceLastStatusAt = 0;
         let presenceLoopStarted = false;
         let presenceMotionFrames = 0;
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
@@ -772,14 +773,24 @@
             const frame = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             let score = 0;
             if (presenceLastFrame) {
-                for (let i = 0; i < frame.length; i += 16) {
-                    score += Math.abs(frame[i] - presenceLastFrame[i]);
+                let samples = 0;
+                for (let i = 0; i < frame.length; i += 32) {
+                    const diff =
+                        Math.abs(frame[i] - presenceLastFrame[i]) +
+                        Math.abs(frame[i + 1] - presenceLastFrame[i + 1]) +
+                        Math.abs(frame[i + 2] - presenceLastFrame[i + 2]);
+                    score += diff / 3;
+                    samples += 1;
                 }
-                score = score / (frame.length / 16);
+                score = score / Math.max(1, samples);
             }
             presenceLastFrame = new Uint8ClampedArray(frame);
 
             const now = Date.now();
+            if (!appIsOpen && now - presenceLastStatusAt > 1000) {
+                presenceLastStatusAt = now;
+                setPresenceStatus(`Kamera aktif. Hareket seviyesi: ${score.toFixed(1)}`);
+            }
             if (score > PRESENCE_SCORE_THRESHOLD) {
                 presenceMotionFrames += 1;
             } else {
