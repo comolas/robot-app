@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -33,7 +33,7 @@
         };
     </script>
     <style>
-        /* ── TEMA DEĞİŞKENLERİ ── */
+        /* â”€â”€ TEMA DEÄÄ°ÅKENLERÄ° â”€â”€ */
         :root {
             --bg:        #ffffff;
             --bg-soft:   #f0f2f8;
@@ -87,7 +87,7 @@
             --pron-ref-bg: #1e2130;
         }
 
-        /* ── TEMA TOGGLE DÜĞMESİ ── */
+        /* â”€â”€ TEMA TOGGLE DÃœÄMESÄ° â”€â”€ */
         #themeToggle {
             position: fixed; top: 16px; right: 20px; z-index: 999;
             background: var(--bg-card); border: 1.5px solid var(--border);
@@ -105,7 +105,7 @@
             background: var(--bg); color: var(--text);
             transition: background 0.25s, color 0.25s;
         }
-        body::before { content: ''; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: url('https://r.resimlink.com/fwISR.jpg') center/contain no-repeat; opacity: 0.5; z-index: -1; pointer-events: none; }
+        body::before { content: ''; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: url('https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/data_koleji.jpg?alt=media&token=db8f20c4-124d-4a25-b80f-1b5e4b0b71b1') center/contain no-repeat; opacity: 0.5; z-index: -1; pointer-events: none; }
         h1, h2 { font-family: 'EB Garamond', serif; font-weight: 600; color: var(--text); }
         input, select {
             width: 100%; padding: 12px; font-size: 18px;
@@ -134,7 +134,7 @@
         }
         .loading { color: var(--text-muted); font-style: italic; }
 
-        /* ── SKELETON LOADER ── */
+        /* â”€â”€ SKELETON LOADER â”€â”€ */
         @keyframes shimmer {
             0%   { background-position: -600px 0; }
             100% { background-position:  600px 0; }
@@ -267,8 +267,8 @@
         details { margin: 10px 0; border: 1px solid var(--border-soft); border-radius: 6px; }
         details summary { cursor: pointer; font-weight: 500; padding: 10px 14px; list-style: none; color: var(--text); }
         details summary::-webkit-details-marker { display: none; }
-        details summary::before { content: "▶ "; font-size: 12px; }
-        details[open] summary::before { content: "▼ "; font-size: 12px; }
+        details summary::before { content: "â–¶ "; font-size: 12px; }
+        details[open] summary::before { content: "â–¼ "; font-size: 12px; }
         details summary:hover { color: #007bff; }
         .answer-text { padding: 10px 16px; background: var(--answer-text-bg); border-top: 1px solid var(--border-soft); border-radius: 0 0 6px 6px; color: var(--text); }
         .q-audio-btn { width: auto; display: inline; padding: 2px 8px; margin: 0 0 0 6px; font-size: 14px; vertical-align: middle; }
@@ -359,7 +359,7 @@
         .sim-reaction { padding: 14px; background: var(--bg-soft); border-radius: 8px; border: 1px solid #ffc107; margin: 10px 0; font-family: monospace; font-size: 16px; text-align: center; color: var(--text); }
         .sim-controls { display: flex; gap: 10px; margin: 14px 0; }
         .sim-controls .btn { flex: 1; }
-        /* Hızlı Soru Kartları */
+        /* HÄ±zlÄ± Soru KartlarÄ± */
         .quick-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
         .quick-card {
             background: var(--bg-card);
@@ -391,9 +391,9 @@
         .gallery-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; cursor: pointer; }
         .gallery-overlay img { max-width: 90%; max-height: 90%; border-radius: 8px; }
 
-        /* ── RESPONSIVE ── */
+        /* â”€â”€ RESPONSIVE â”€â”€ */
 
-        /* Tablet: 600px – 900px */
+        /* Tablet: 600px â€“ 900px */
         @media (max-width: 900px) {
             body { max-width: 100%; margin: 24px auto; padding: 16px; font-size: 17px; }
             #themeToggle { top: 10px; right: 12px; }
@@ -403,7 +403,7 @@
             .eval-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        /* Mobil: ≤ 599px */
+        /* Mobil: â‰¤ 599px */
         @media (max-width: 599px) {
             body { margin: 0; padding: 12px; font-size: 16px; border-radius: 0; }
             #themeToggle { top: 8px; right: 10px; padding: 4px 10px; font-size: 16px; }
@@ -412,28 +412,28 @@
             h1 img { height: 30px; }
             h2 { font-size: 1.1rem; }
 
-            /* Kartlar tek sütun */
+            /* Kartlar tek sÃ¼tun */
             .quick-cards { grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
             .quick-card { padding: 12px 8px 10px; }
             .quick-card-icon { font-size: 26px; }
             .quick-card-label { font-size: 13px; }
             .quick-card-desc { display: none; }
 
-            /* Galeri tek sütun */
+            /* Galeri tek sÃ¼tun */
             .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
             .gallery-grid img { height: 120px; }
             .sk-img { height: 120px; }
 
-            /* Düzey seçici satırları dikey */
+            /* DÃ¼zey seÃ§ici satÄ±rlarÄ± dikey */
             .level-row { flex-direction: column; gap: 6px; }
             .level-row select { width: 100%; flex: unset; }
             .level-row .btn { width: 100%; }
 
-            /* Rapor satırı */
+            /* Rapor satÄ±rÄ± */
             .report-row { flex-direction: column; }
             .report-row .btn { width: 100%; margin-top: 6px; }
 
-            /* Değerlendirme ızgarası */
+            /* DeÄŸerlendirme Ä±zgarasÄ± */
             .eval-grid { grid-template-columns: repeat(2, 1fr); }
 
             /* Butonlar */
@@ -455,7 +455,7 @@
             /* Sohbet kutusu */
             .chat-msg { max-width: 95%; }
 
-            /* Stat kartları */
+            /* Stat kartlarÄ± */
             .stat-card { min-width: 80px; padding: 10px 12px; }
             .stat-value { font-size: 22px; }
 
@@ -465,7 +465,7 @@
     </style>
 </head>
 <body>
-    <section id="idleScreen" aria-label="Karşılama ekranı">
+    <section id="idleScreen" aria-label="KarÅŸÄ±lama ekranÄ±">
         <div id="idleFace" class="line-face is-happy" aria-hidden="true" onclick="setIdleFace('petted', 2500)">
             <div class="line-brow left"></div>
             <div class="line-brow right"></div>
@@ -475,62 +475,62 @@
             <div class="line-cheek right"></div>
             <div class="line-smile"></div>
         </div>
-        <p class="idle-title">Hoş Geldiniz</p>
-        <p id="presenceStatus" class="presence-status">Kamera hazırlanıyor...</p>
-        <button class="idle-action" onclick="openApp()">BİLGİ AL</button>
+        <p class="idle-title">HoÅŸ Geldiniz</p>
+        <p id="presenceStatus" class="presence-status">Kamera hazÄ±rlanÄ±yor...</p>
+        <button class="idle-action" onclick="openApp()">BÄ°LGÄ° AL</button>
         <video id="presenceVideo" class="presence-camera" autoplay muted playsinline></video>
         <canvas id="presenceCanvas" class="presence-camera" width="240" height="135"></canvas>
     </section>
     <main id="appShell" aria-hidden="true">
-    <button id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
-    <h1><a href="" onclick="location.reload(); return false;" style="text-decoration:none; color:inherit;"><img src="https://r.resimlink.com/fwISR.jpg" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"></a>Data Koleji Okul Tanıtım Robotu</h1>
+    <button id="themeToggle" onclick="toggleTheme()" title="Tema DeÄŸiÅŸtir">ğŸŒ™</button>
+    <h1><a href="" onclick="location.reload(); return false;" style="text-decoration:none; color:inherit;"><img src="https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/data_koleji.jpg?alt=media&token=db8f20c4-124d-4a25-b80f-1b5e4b0b71b1" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"></a>Data Koleji Okul TanÄ±tÄ±m Robotu</h1>
 
     <div id="welcomeBox" style="padding:20px; text-align:center; margin-bottom:20px;">
         <video id="robotVideo" src="https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/Cartoon_boy_waving_and_speaking_202606212234.mp4?alt=media&token=5de8d92a-9ba5-440d-8db9-8da48f2e3c39"
             autoplay loop muted playsinline
             style="display:block; margin:0 auto 12px auto; width:200px; height:200px; object-fit:cover; border-radius:50%;"></video>
-        <p style="font-size:26px; font-weight:700; margin:0 0 14px 0; letter-spacing:2px; text-transform:uppercase; color:var(--text);">Hoş Geldiniz!</p>
+        <p style="font-size:26px; font-weight:700; margin:0 0 14px 0; letter-spacing:2px; text-transform:uppercase; color:var(--text);">HoÅŸ Geldiniz!</p>
         <div class="quick-cards">
-            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okul hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">🏫</span>
-                <div class="quick-card-label">Okul Hakkında</div>
-                <div class="quick-card-desc">Genel bilgi ve tarihçe</div>
+            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okul hakkÄ±nda bilgi ver'; askQuestion();">
+                <span class="quick-card-icon">ğŸ«</span>
+                <div class="quick-card-label">Okul HakkÄ±nda</div>
+                <div class="quick-card-desc">Genel bilgi ve tarihÃ§e</div>
             </div>
-            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Uçak Bakım Bölümü hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">✈️</span>
-                <div class="quick-card-label">Uçak Bakım</div>
-                <div class="quick-card-desc">Bölüm ve kariyer fırsatları</div>
+            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='UÃ§ak BakÄ±m BÃ¶lÃ¼mÃ¼ hakkÄ±nda bilgi ver'; askQuestion();">
+                <span class="quick-card-icon">âœˆï¸</span>
+                <div class="quick-card-label">UÃ§ak BakÄ±m</div>
+                <div class="quick-card-desc">BÃ¶lÃ¼m ve kariyer fÄ±rsatlarÄ±</div>
             </div>
-            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Elektrik Bölümü hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">⚡</span>
-                <div class="quick-card-label">Elektrik Bölümü</div>
-                <div class="quick-card-desc">Müfredat ve olanaklar</div>
+            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Elektrik BÃ¶lÃ¼mÃ¼ hakkÄ±nda bilgi ver'; askQuestion();">
+                <span class="quick-card-icon">âš¡</span>
+                <div class="quick-card-label">Elektrik BÃ¶lÃ¼mÃ¼</div>
+                <div class="quick-card-desc">MÃ¼fredat ve olanaklar</div>
             </div>
-            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Makine Bölümü hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">⚙️</span>
-                <div class="quick-card-label">Makine Bölümü</div>
-                <div class="quick-card-desc">Müfredat ve olanaklar</div>
+            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Makine BÃ¶lÃ¼mÃ¼ hakkÄ±nda bilgi ver'; askQuestion();">
+                <span class="quick-card-icon">âš™ï¸</span>
+                <div class="quick-card-label">Makine BÃ¶lÃ¼mÃ¼</div>
+                <div class="quick-card-desc">MÃ¼fredat ve olanaklar</div>
             </div>
-            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okul etkinlikleri hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">🎉</span>
+            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okul etkinlikleri hakkÄ±nda bilgi ver'; askQuestion();">
+                <span class="quick-card-icon">ğŸ‰</span>
                 <div class="quick-card-label">Etkinlikler</div>
-                <div class="quick-card-desc">Kulüpler ve sosyal faaliyetler</div>
+                <div class="quick-card-desc">KulÃ¼pler ve sosyal faaliyetler</div>
             </div>
-            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okula ait görselleri göster'; askQuestion();">
-                <span class="quick-card-icon">🖼️</span>
+            <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okula ait gÃ¶rselleri gÃ¶ster'; askQuestion();">
+                <span class="quick-card-icon">ğŸ–¼ï¸</span>
                 <div class="quick-card-label">Okul Galerisi</div>
-                <div class="quick-card-desc">Fotoğraflar ve görseller</div>
+                <div class="quick-card-desc">FotoÄŸraflar ve gÃ¶rseller</div>
             </div>
         </div>
     </div>
 
-    <!-- PDF GÖRÜNTÜLEYİCİ -->
+    <!-- PDF GÃ–RÃœNTÃœLEYÄ°CÄ° -->
     <div id="pdfViewer" style="display:none; margin-bottom:30px;">
         <div style="background:#2c2c2c; border-radius:8px; padding:10px; text-align:center;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <button class="btn btn-inline" style="background:#555; margin:0;" onclick="pdfPrev()">◀ Önceki</button>
+                <button class="btn btn-inline" style="background:#555; margin:0;" onclick="pdfPrev()">â—€ Ã–nceki</button>
                 <span id="pdfPageInfo" style="color:#fff; font-size:16px;"></span>
-                <button class="btn btn-inline" style="background:#555; margin:0;" onclick="pdfNext()">▶ Sonraki</button>
+                <button class="btn btn-inline" style="background:#555; margin:0;" onclick="pdfNext()">â–¶ Sonraki</button>
             </div>
             <img id="pdfImage" src="" alt="PDF Sayfa" style="max-width:100%; border-radius:4px; box-shadow:0 4px 20px rgba(0,0,0,0.4);" />
         </div>
@@ -543,51 +543,51 @@
             style="display:block; margin:0 auto; width:80px; height:80px; object-fit:cover; border-radius:50%;"></video>
         <p id="faceLabel" style="margin:4px 0 0 0; font-size:14px; color:var(--text-muted);"></p>
     </div>
-    <input type="text" id="question" placeholder="Sorunuzu yazın..." />
+    <input type="text" id="question" placeholder="Sorunuzu yazÄ±n..." />
     <div style="display:flex; gap:10px;">
-        <button class="btn" style="flex:1; background:#1e1b4b;" onclick="askQuestion()">Sor</button>
-        <button id="voiceBtn" class="btn btn-danger" style="flex:0 0 auto; width:auto; padding:14px 24px;" onclick="toggleVoiceInput()">🎙️</button>
+        <button class="btn" style="flex:1; background:#1e1b4b;" onclick="askQuestion()">G&ouml;nder</button>
+        <button id="voiceBtn" class="btn btn-danger" style="flex:0 0 auto; width:auto; padding:14px 24px;" onclick="toggleVoiceInput()">ğŸ™ï¸</button>
     </div>
-    <p id="voiceStatus" style="display:none;" class="recording-indicator">⏺ Dinleniyor...</p>
+    <p id="voiceStatus" style="display:none;" class="recording-indicator">âº Dinleniyor...</p>
     <div id="answer" class="result-box" style="display:none;"></div>
 
-    <!-- DENEY SİMÜLASYONU -->
+    <!-- DENEY SÄ°MÃœLASYONU -->
     <div id="simSection" style="display:none;">
         <hr>
-        <h2>🧪 Deney Simülasyonu</h2>
-        <button class="btn btn-success" onclick="generateSimulation()">🧪 Simülasyon Oluştur</button>
+        <h2>ğŸ§ª Deney SimÃ¼lasyonu</h2>
+        <button class="btn btn-success" onclick="generateSimulation()">ğŸ§ª SimÃ¼lasyon OluÅŸtur</button>
         <canvas id="labCanvas" width="760" height="400" style="display:none; background:linear-gradient(180deg,#e8eaf6 0%,#c5cae9 100%); border-radius:8px; border:1px solid #9fa8da; margin-top:12px;"></canvas>
         <div id="simStepInfo" style="display:none; padding:12px; margin-top:8px; background:var(--bg-card); border-radius:8px; border:1px solid var(--border-soft); color:var(--text);"></div>
         <div id="simResult" style="display:none;"></div>
     </div>
 
-    <!-- SEVİYE UYARLAMA -->
+    <!-- SEVÄ°YE UYARLAMA -->
     <div id="simplifySection" style="display:none;">
         <hr>
-        <h2>📚 Seviye Uyarlama</h2>
+        <h2>ğŸ“š Seviye Uyarlama</h2>
         <div class="simplify-section">
-            <p><strong>Metni farklı bir dil seviyesine uyarlayın:</strong></p>
+            <p><strong>Metni farklÄ± bir dil seviyesine uyarlayÄ±n:</strong></p>
             <div class="level-row">
                 <select id="targetLevel">
-                    <option value="A1">A1 - Başlangıç</option>
+                    <option value="A1">A1 - BaÅŸlangÄ±Ã§</option>
                     <option value="A2" selected>A2 - Temel</option>
                     <option value="B1">B1 - Orta</option>
-                    <option value="B2">B2 - Orta Üstü</option>
-                    <option value="C1">C1 - İleri</option>
+                    <option value="B2">B2 - Orta ÃœstÃ¼</option>
+                    <option value="C1">C1 - Ä°leri</option>
                     <option value="C2">C2 - Uzman</option>
                 </select>
-                <button class="btn btn-purple" onclick="simplifyText()">✨ Uyarla</button>
+                <button class="btn btn-purple" onclick="simplifyText()">âœ¨ Uyarla</button>
             </div>
         </div>
         <div id="simplifyResult" style="display:none;"></div>
     </div>
 
-    <!-- SINAV / QUIZ OLUŞTURUCU -->
+    <!-- SINAV / QUIZ OLUÅTURUCU -->
     <div id="quizSection" style="display:none;">
         <hr>
-        <h2>📝 Sınav / Quiz Oluşturucu</h2>
+        <h2>ğŸ“ SÄ±nav / Quiz OluÅŸturucu</h2>
         <div class="quiz-section">
-            <p><strong>Metinden otomatik sınav oluşturun:</strong></p>
+            <p><strong>Metinden otomatik sÄ±nav oluÅŸturun:</strong></p>
             <div class="level-row">
                 <select id="quizDifficulty">
                     <option value="easy">Kolay (A1-A2)</option>
@@ -600,18 +600,18 @@
                     <option value="8">8 Soru</option>
                     <option value="10">10 Soru</option>
                 </select>
-                <button class="btn btn-success" onclick="generateQuiz()">📝 Oluştur</button>
+                <button class="btn btn-success" onclick="generateQuiz()">ğŸ“ OluÅŸtur</button>
             </div>
         </div>
         <div id="quizResult" style="display:none;"></div>
     </div>
 
-    <!-- KELİME LİSTESİ -->
+    <!-- KELÄ°ME LÄ°STESÄ° -->
     <div id="vocabSection" style="display:none;">
         <hr>
-        <h2>📖 Kelime Listesi</h2>
+        <h2>ğŸ“– Kelime Listesi</h2>
         <div class="vocab-section">
-            <p><strong>Metindeki önemli kelimeleri çıkarın:</strong></p>
+            <p><strong>Metindeki Ã¶nemli kelimeleri Ã§Ä±karÄ±n:</strong></p>
             <div class="level-row">
                 <select id="vocabLevel">
                     <option value="A1">A1</option>
@@ -621,33 +621,33 @@
                     <option value="C1">C1</option>
                     <option value="C2">C2</option>
                 </select>
-                <button class="btn btn-primary" onclick="extractVocabulary()">📖 Kelimeleri Çıkar</button>
+                <button class="btn btn-primary" onclick="extractVocabulary()">ğŸ“– Kelimeleri Ã‡Ä±kar</button>
             </div>
         </div>
         <div id="vocabResult" style="display:none;"></div>
     </div>
 
-    <!-- TELAFFUZ TESTİ -->
+    <!-- TELAFFUZ TESTÄ° -->
     <div id="pronSection" style="display:none;">
         <hr>
-        <h2>🎤 Telaffuz Testi</h2>
+        <h2>ğŸ¤ Telaffuz Testi</h2>
         <div class="pron-section">
-            <p><strong>Aşağıdaki metni sesli okuyun:</strong></p>
+            <p><strong>AÅŸaÄŸÄ±daki metni sesli okuyun:</strong></p>
             <div id="pronReferenceText" style="padding:12px; background:var(--pron-ref-bg); border-radius:6px; border:1px solid var(--border-soft); margin-bottom:12px; color:var(--text);"></div>
-            <input type="text" id="studentName" class="input-name" placeholder="Öğrenci adı (opsiyonel)" value="" />
-            <button id="btnRecord" class="btn btn-danger" onclick="toggleRecording()">🎙️ Kayda Başla</button>
-            <p id="recordingStatus" style="display:none;" class="recording-indicator">⏺ Kayıt yapılıyor...</p>
-            <button id="btnSendPron" class="btn btn-success" style="display:none;" onclick="sendPronunciation()">📤 Değerlendir</button>
+            <input type="text" id="studentName" class="input-name" placeholder="Ã–ÄŸrenci adÄ± (opsiyonel)" value="" />
+            <button id="btnRecord" class="btn btn-danger" onclick="toggleRecording()">ğŸ™ï¸ Kayda BaÅŸla</button>
+            <p id="recordingStatus" style="display:none;" class="recording-indicator">âº KayÄ±t yapÄ±lÄ±yor...</p>
+            <button id="btnSendPron" class="btn btn-success" style="display:none;" onclick="sendPronunciation()">ğŸ“¤ DeÄŸerlendir</button>
         </div>
         <div id="pronResult" class="result-box" style="display:none;"></div>
     </div>
 
-    <!-- KONUŞMA PRATİĞİ -->
+    <!-- KONUÅMA PRATÄ°ÄÄ° -->
     <div id="dialogueSection" style="display:none;">
     <hr>
-    <h2>💬 Konuşma Pratiği</h2>
+    <h2>ğŸ’¬ KonuÅŸma PratiÄŸi</h2>
     <div class="dialogue-section">
-        <p><strong>Bir senaryo seçin ve İngilizce konuşma pratiği yapın:</strong></p>
+        <p><strong>Bir senaryo seÃ§in ve Ä°ngilizce konuÅŸma pratiÄŸi yapÄ±n:</strong></p>
         <div class="level-row">
             <select id="dlgScenario"></select>
             <select id="dlgLevel">
@@ -656,26 +656,26 @@
                 <option value="B2">B2</option>
                 <option value="C1">C1</option>
             </select>
-            <button class="btn btn-primary" onclick="startDialogue()">🚀 Başlat</button>
+            <button class="btn btn-primary" onclick="startDialogue()">ğŸš€ BaÅŸlat</button>
         </div>
     </div>
     <div id="dlgChat" style="display:none;">
         <div id="dlgChatBox" class="chat-box"></div>
-        <button id="dlgRecordBtn" class="btn btn-danger" onclick="dlgToggleRecord()">🎙️ Konuş</button>
-        <p id="dlgRecStatus" style="display:none;" class="recording-indicator">⏺ Kayıt yapılıyor...</p>
-        <button id="dlgSendBtn" class="btn btn-success" style="display:none;" onclick="dlgSend()">📤 Gönder</button>
+        <button id="dlgRecordBtn" class="btn btn-danger" onclick="dlgToggleRecord()">ğŸ™ï¸ KonuÅŸ</button>
+        <p id="dlgRecStatus" style="display:none;" class="recording-indicator">âº KayÄ±t yapÄ±lÄ±yor...</p>
+        <button id="dlgSendBtn" class="btn btn-success" style="display:none;" onclick="dlgSend()">ğŸ“¤ GÃ¶nder</button>
         <div id="dlgEvaluation" style="display:none;"></div>
     </div>
     </div>
 
-    <!-- ÖĞRENCİ PERFORMANS RAPORU -->
+    <!-- Ã–ÄRENCÄ° PERFORMANS RAPORU -->
     <div id="reportSection" style="display:none;">
     <hr>
-    <h2>📊 Öğrenci Performans Raporu</h2>
+    <h2>ğŸ“Š Ã–ÄŸrenci Performans Raporu</h2>
     <div class="report-section">
         <div class="report-row">
-            <select id="reportStudent"><option value="">Öğrenci seçin...</option></select>
-            <button class="btn btn-primary" onclick="loadReport()">📄 Rapor Görüntüle</button>
+            <select id="reportStudent"><option value="">Ã–ÄŸrenci seÃ§in...</option></select>
+            <button class="btn btn-primary" onclick="loadReport()">ğŸ“„ Rapor GÃ¶rÃ¼ntÃ¼le</button>
         </div>
     </div>
     <div id="reportResult" style="display:none;"></div>
@@ -751,17 +751,17 @@
             if (personModelReady || personModelFailed || personModel) return;
             if (!window.cocoSsd) {
                 personModelFailed = true;
-                setPresenceStatus('İnsan algılama modeli yüklenemedi. Hareket algılama yedekte.');
+                setPresenceStatus('Ä°nsan algÄ±lama modeli yÃ¼klenemedi. Hareket algÄ±lama yedekte.');
                 return;
             }
             try {
-                setPresenceStatus('İnsan algılama modeli yükleniyor...');
+                setPresenceStatus('Ä°nsan algÄ±lama modeli yÃ¼kleniyor...');
                 personModel = await cocoSsd.load();
                 personModelReady = true;
-                setPresenceStatus('İnsan algılama aktif.');
+                setPresenceStatus('Ä°nsan algÄ±lama aktif.');
             } catch (e) {
                 personModelFailed = true;
-                setPresenceStatus('İnsan algılama modeli yüklenemedi. Hareket algılama yedekte.');
+                setPresenceStatus('Ä°nsan algÄ±lama modeli yÃ¼klenemedi. Hareket algÄ±lama yedekte.');
             }
         }
 
@@ -784,7 +784,7 @@
                     requestAnimationFrame(checkPresenceFrame);
                 }
             } catch (e) {
-                setPresenceStatus('Kamera izni verilirse sizi karşılayabilirim.');
+                setPresenceStatus('Kamera izni verilirse sizi karÅŸÄ±layabilirim.');
             }
         }
 
@@ -821,7 +821,7 @@
             }
             if (!appIsOpen && now - presenceLastStatusAt > 1000) {
                 presenceLastStatusAt = now;
-                const mode = personModelReady ? 'İnsan algılama aktif' : 'Hareket algılama yedekte';
+                const mode = personModelReady ? 'Ä°nsan algÄ±lama aktif' : 'Hareket algÄ±lama yedekte';
                 setPresenceStatus(`${mode}. Hareket seviyesi: ${score.toFixed(1)}`);
             }
             if (personModelFailed && score > PRESENCE_SCORE_THRESHOLD) {
@@ -846,12 +846,12 @@
                 const person = predictions.find(item => item.class === 'person' && item.score >= PERSON_SCORE_THRESHOLD);
                 if (person && Date.now() - presenceLastGreetingAt > PRESENCE_COOLDOWN_MS) {
                     presenceLastGreetingAt = Date.now();
-                    setPresenceStatus(`İnsan algılandı (${Math.round(person.score * 100)}%).`);
+                    setPresenceStatus(`Ä°nsan algÄ±landÄ± (${Math.round(person.score * 100)}%).`);
                     greetDetectedVisitor();
                 }
             } catch (e) {
                 personModelFailed = true;
-                setPresenceStatus('İnsan algılama durdu. Hareket algılama yedekte.');
+                setPresenceStatus('Ä°nsan algÄ±lama durdu. Hareket algÄ±lama yedekte.');
             } finally {
                 personDetectionBusy = false;
             }
@@ -859,8 +859,8 @@
 
         async function greetDetectedVisitor() {
             setIdleFace('happy', 5000);
-            setPresenceStatus('Merhaba, okulumuza hoş geldiniz.');
-            const greetingText = 'Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.';
+            setPresenceStatus('Merhaba, okulumuza hoÅŸ geldiniz.');
+            const greetingText = 'Merhaba, okulumuza hoÅŸ geldiniz. Bilgi almak iÃ§in Bilgi Al butonuna tÄ±klayabilirsiniz.';
             speakLocalGreeting(greetingText);
             try {
                 const response = await fetch(`${API}/session/start`, {
@@ -896,8 +896,8 @@
 
         function reactToPositiveFeedback(text) {
             const value = (text || '').toLocaleLowerCase('tr-TR');
-            const complimentWords = ['harika', 'super', 'süper', 'mukemmel', 'mükemmel', 'cok iyi', 'çok iyi', 'tatli', 'tatlı', 'sevimli'];
-            const thanksWords = ['tesekkur', 'teşekkür', 'sag ol', 'sağ ol', 'eline saglik', 'eline sağlık'];
+            const complimentWords = ['harika', 'super', 'sÃ¼per', 'mukemmel', 'mÃ¼kemmel', 'cok iyi', 'Ã§ok iyi', 'tatli', 'tatlÄ±', 'sevimli'];
+            const thanksWords = ['tesekkur', 'teÅŸekkÃ¼r', 'sag ol', 'saÄŸ ol', 'eline saglik', 'eline saÄŸlÄ±k'];
             if (complimentWords.some(word => value.includes(word))) {
                 setIdleFace('complimented', 5000);
                 return;
@@ -982,23 +982,23 @@
             if (q) q.focus();
         }
 
-        // ── TEMA YÖNETİMİ ──
+        // â”€â”€ TEMA YÃ–NETÄ°MÄ° â”€â”€
         function toggleTheme() {
             const html = document.documentElement;
             const btn  = document.getElementById('themeToggle');
             const isDark = html.getAttribute('data-theme') === 'dark';
             html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            btn.textContent = isDark ? '🌙' : '☀️';
+            btn.textContent = isDark ? 'ğŸŒ™' : 'â˜€ï¸';
             localStorage.setItem('theme', isDark ? 'light' : 'dark');
         }
-        // Kaydedilmiş temayı uygula
+        // KaydedilmiÅŸ temayÄ± uygula
         (function () {
             const saved = localStorage.getItem('theme') ||
                 (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', saved);
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
-                if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+                if (btn) btn.textContent = saved === 'dark' ? 'â˜€ï¸' : 'ğŸŒ™';
                 showIdleScreen();
                 startPresenceCamera();
                 requestFullscreenMode();
@@ -1010,7 +1010,7 @@
 
         function playAudio(url) { event.stopPropagation(); new Audio(url).play(); }
 
-        // ── SKELETON ŞABLONLARI ──
+        // â”€â”€ SKELETON ÅABLONLARI â”€â”€
         const SKL = {
             answer: `<div class="skeleton-wrap">
                 <span class="sk sk-title"></span>
@@ -1040,7 +1040,7 @@
             </div>`,
         };
 
-        // ── ROBOT MOD YÖNETİMİ ──
+        // â”€â”€ ROBOT MOD YÃ–NETÄ°MÄ° â”€â”€
         const VIDEO_DEFAULT   = 'https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/Cartoon_boy_waving_and_speaking_202606212234.mp4?alt=media&token=5de8d92a-9ba5-440d-8db9-8da48f2e3c39';
         const VIDEO_LISTENING  = 'https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/Cartoon_boy_listening_intently_s%E2%80%A6_202606212241.mp4?alt=media&token=5676c882-b758-40e9-b317-6b166405758d';
         const VIDEO_SPEAKING   = 'https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/Cartoon_boy_speaking_Turkish_202606212248.mp4?alt=media&token=8f20c934-d1c3-4a96-8390-fa680bdecaf2';
@@ -1063,7 +1063,7 @@
             });
         }
 
-        // ── GALERİ ──
+        // â”€â”€ GALERÄ° â”€â”€
         async function showGallery(container) {
             container.style.display = 'block';
             container.innerHTML = SKL.gallery;
@@ -1071,10 +1071,10 @@
                 const r = await fetch(`${API}/school/gallery`);
                 const data = await r.json();
                 if (!data.images || data.images.length === 0) {
-                    container.innerHTML = '<p>Galeri görseli bulunamadı.</p>';
+                    container.innerHTML = '<p>Galeri gÃ¶rseli bulunamadÄ±.</p>';
                     return;
                 }
-                let html = `<strong>Okul Galerisi (${data.count} görsel)</strong>`;
+                let html = `<strong>Okul Galerisi (${data.count} gÃ¶rsel)</strong>`;
                 html += `<div class="gallery-grid">`;
                 data.images.forEach(img => {
                     html += `<img src="${img.url}" alt="${img.alt||''}" loading="lazy" onclick="openLightbox('${img.url}')" />`;
@@ -1082,7 +1082,7 @@
                 html += `</div>`;
                 container.innerHTML = html;
             } catch(e) {
-                container.innerHTML = '<p style="color:red;">Galeri yüklenemedi.</p>';
+                container.innerHTML = '<p style="color:red;">Galeri yÃ¼klenemedi.</p>';
             }
         }
 
@@ -1091,7 +1091,7 @@
             document.getElementById('galleryOverlay').style.display = 'flex';
         }
 
-        // ── SESLİ KOMUT ──
+        // â”€â”€ SESLÄ° KOMUT â”€â”€
         let voiceRecorder = null, voiceChunks = [];
 
         async function toggleVoiceInput() {
@@ -1116,14 +1116,14 @@
                 };
                 voiceRecorder.onstop = async () => {
                     stream.getTracks().forEach(t => t.stop());
-                    document.getElementById('voiceBtn').textContent = '🎙️';
+                    document.getElementById('voiceBtn').textContent = 'ğŸ™ï¸';
                     document.getElementById('voiceStatus').style.display = 'none';
                     switchVideo('default');
                     const blob = new Blob(voiceChunks, { type: voiceRecorder.mimeType || mimeType || 'audio/webm' });
                     await sendVoiceCommand(blob);
                 };
                 voiceRecorder.start(250);
-                document.getElementById('voiceBtn').textContent = '⏹️';
+                document.getElementById('voiceBtn').textContent = 'â¹ï¸';
                 document.getElementById('voiceStatus').style.display = 'block';
                 document.getElementById('welcomeBox').style.display = 'none';
                 document.getElementById('faceBar').style.display = 'block';
@@ -1135,7 +1135,7 @@
                         voiceRecorder.stop();
                     }
                 }, 15000);
-            } catch(e) { alert('Mikrofon erişimi reddedildi.'); }
+            } catch(e) { alert('Mikrofon eriÅŸimi reddedildi.'); }
         }
 
         async function sendVoiceCommand(blob) {
@@ -1144,7 +1144,7 @@
             answerDiv.innerHTML = SKL.minimal;
 
             if (!blob || blob.size < 1200) {
-                answerDiv.innerHTML = '<p style="color:red;">Ses kaydı çok kısa veya boş görünüyor. Lütfen butona bastıktan sonra 1-2 saniye bekleyip konuşun.</p>';
+                answerDiv.innerHTML = '<p style="color:red;">Ses kaydÄ± Ã§ok kÄ±sa veya boÅŸ gÃ¶rÃ¼nÃ¼yor. LÃ¼tfen butona bastÄ±ktan sonra 1-2 saniye bekleyip konuÅŸun.</p>';
                 return;
             }
 
@@ -1155,47 +1155,47 @@
                 const r = await fetch(`${API}/voice-ask`, { method: 'POST', body: fd });
                 const data = await r.json();
                 if (data.error || !data.transcript) {
-                    answerDiv.innerHTML = `<p style="color:red;">${data.error || 'Ses anlaşılamadı.'}</p>`;
+                    answerDiv.innerHTML = `<p style="color:red;">${data.error || 'Ses anlaÅŸÄ±lamadÄ±.'}</p>`;
                     return;
                 }
-                // Tanınan metni input'a yaz ve soruyu gönder
+                // TanÄ±nan metni input'a yaz ve soruyu gÃ¶nder
                 document.getElementById('question').value = data.transcript;
                 answerDiv.innerHTML = SKL.answer;
                 await askQuestion();
             } catch(e) {
-                answerDiv.innerHTML = '<p style="color:red;">Ses komutu gönderilemedi.</p>';
+                answerDiv.innerHTML = '<p style="color:red;">Ses komutu gÃ¶nderilemedi.</p>';
             }
         }
 
-        // ── PDF GÖRÜNTÜLEYİCİ ──
+        // â”€â”€ PDF GÃ–RÃœNTÃœLEYÄ°CÄ° â”€â”€
         function showPdfPage(pdfName, page, totalPages) {
             pdfState = { name: pdfName, page, totalPages };
             document.getElementById('pdfImage').src = `${API}/pdf/page-image?pdf_name=${encodeURIComponent(pdfName)}&page=${page}&zoom=2`;
-            document.getElementById('pdfPageInfo').textContent = `${pdfName} — Sayfa ${page} / ${totalPages}`;
+            document.getElementById('pdfPageInfo').textContent = `${pdfName} â€” Sayfa ${page} / ${totalPages}`;
             document.getElementById('pdfViewer').style.display = 'block';
         }
         function pdfPrev() {
             if (pdfState.page > 1) {
                 showPdfPage(pdfState.name, pdfState.page - 1, pdfState.totalPages);
-                document.getElementById('question').value = `${pdfState.name} ${pdfState.page}. sayfayı oku`;
+                document.getElementById('question').value = `${pdfState.name} ${pdfState.page}. sayfayÄ± oku`;
                 askQuestion();
             }
         }
         function pdfNext() {
             if (pdfState.page < pdfState.totalPages) {
                 showPdfPage(pdfState.name, pdfState.page + 1, pdfState.totalPages);
-                document.getElementById('question').value = `${pdfState.name} ${pdfState.page}. sayfayı oku`;
+                document.getElementById('question').value = `${pdfState.name} ${pdfState.page}. sayfayÄ± oku`;
                 askQuestion();
             }
         }
 
-        // PDF bilgilerini yükle
+        // PDF bilgilerini yÃ¼kle
         async function loadLessons() {
             try {
                 const r = await fetch(`${API}/english/lessons`);
                 const data = await r.json();
                 if (data.lessons && data.lessons.length > 0) {
-                    // İlk PDF'in bilgilerini sakla
+                    // Ä°lk PDF'in bilgilerini sakla
                     const first = data.lessons[0];
                     pdfState.name = first.name;
                     pdfState.totalPages = first.pages;
@@ -1204,7 +1204,7 @@
         }
         loadLessons();
 
-        // ── SORU-CEVAP ──
+        // â”€â”€ SORU-CEVAP â”€â”€
         async function askQuestion() {
             const question = document.getElementById('question').value;
             const answerDiv = document.getElementById('answer');
@@ -1215,7 +1215,7 @@
             answerDiv.innerHTML = SKL.answer;
             document.getElementById('welcomeBox').style.display = 'none';
             document.getElementById('faceBar').style.display = 'block';
-            setMood('thinking', 'Düşünüyorum...');
+            setMood('thinking', 'DÃ¼ÅŸÃ¼nÃ¼yorum...');
             document.getElementById('pdfViewer').style.display = 'none';
             document.getElementById('simSection').style.display = 'none';
             document.getElementById('pronSection').style.display = 'none';
@@ -1235,30 +1235,30 @@
 
                 // Galeri komutu
                 if (data.answer === '__GALLERY__') {
-                    setMood('happy', 'Galeri yükleniyor!');
+                    setMood('happy', 'Galeri yÃ¼kleniyor!');
                     await showGallery(answerDiv);
                     return;
                 }
 
-                // Kütüphane komutu
+                // KÃ¼tÃ¼phane komutu
                 if (data.answer === '__LIBRARY__') {
-                    setMood('happy', 'Kütüphaneye yönlendiriliyorsunuz!');
-                    answerDiv.innerHTML = '<p>Kütüphane sistemine yönlendiriliyorsunuz...</p>';
+                    setMood('happy', 'KÃ¼tÃ¼phaneye yÃ¶nlendiriliyorsunuz!');
+                    answerDiv.innerHTML = '<p>KÃ¼tÃ¼phane sistemine yÃ¶nlendiriliyorsunuz...</p>';
                     window.open('https://datakoleji.libry.com.tr/#/login', '_blank');
                     return;
                 }
 
-                // PDF sayfa görselini göster
+                // PDF sayfa gÃ¶rselini gÃ¶ster
                 const pageMatch = data.answer.match(/Sayfa (\d+)/);
                 const isPdf = pageMatch && pdfState.name;
 
                 if (isPdf) {
                     const pg = parseInt(pageMatch[1]);
                     setMood('reading', 'Sayfa okunuyor...');
-                    // PDF adını API yanıtından al
+                    // PDF adÄ±nÄ± API yanÄ±tÄ±ndan al
                     if (data.pdf_name) {
                         pdfState.name = data.pdf_name;
-                        // Sayfa sayısını güncelle
+                        // Sayfa sayÄ±sÄ±nÄ± gÃ¼ncelle
                         try {
                             const lr = await fetch(`${API}/english/lessons`);
                             const ld = await lr.json();
@@ -1274,7 +1274,7 @@
                 }
 
                 if (data.audio_path) {
-                    setMood('speaking', 'Konuşuyor...');
+                    setMood('speaking', 'KonuÅŸuyor...');
                     const audio = new Audio(`${API}${data.audio_path}`);
                     audio.onended = () => setMood('happy', '');
                     audio.play();
@@ -1295,15 +1295,15 @@
                     const isScience = !isEnglish;
                     currentLanguage = lang;
 
-                    // Deney Simülasyonu sadece fen bilimleri
+                    // Deney SimÃ¼lasyonu sadece fen bilimleri
                     document.getElementById('simSection').style.display = isScience ? 'block' : 'none';
                     document.getElementById('simResult').style.display = 'none';
 
-                    // Quiz her zaman görünsün
+                    // Quiz her zaman gÃ¶rÃ¼nsÃ¼n
                     document.getElementById('quizSection').style.display = 'block';
                     document.getElementById('quizResult').style.display = 'none';
 
-                    // İngilizce'ye özel bölümler
+                    // Ä°ngilizce'ye Ã¶zel bÃ¶lÃ¼mler
                     document.getElementById('simplifySection').style.display = isEnglish ? 'block' : 'none';
                     document.getElementById('vocabSection').style.display = isEnglish ? 'block' : 'none';
                     document.getElementById('pronSection').style.display = isEnglish ? 'block' : 'none';
@@ -1320,13 +1320,13 @@
                     }
                 }
 
-                // Sorular varsa göster
+                // Sorular varsa gÃ¶ster
                 if (data.questions && data.questions.length > 0) {
-                    let qhtml = '<strong>📝 Sorular:</strong><br>';
+                    let qhtml = '<strong>ğŸ“ Sorular:</strong><br>';
                     data.questions.forEach((q, i) => {
                         const audioUrl = data.question_audio_paths[i] ? `${API}${data.question_audio_paths[i]}` : '';
                         const ans = data.answers && data.answers[i] ? data.answers[i] : '';
-                        const audioBtn = audioUrl ? `<button class="q-audio-btn" onclick="playAudio('${audioUrl}')">🔊</button>` : '';
+                        const audioBtn = audioUrl ? `<button class="q-audio-btn" onclick="playAudio('${audioUrl}')">ğŸ”Š</button>` : '';
                         qhtml += `<details>
                             <summary>${i+1}. ${q} ${audioBtn}</summary>
                             ${ans ? `<div class="answer-text"><strong>Cevap:</strong> ${ans}</div>` : ''}
@@ -1340,12 +1340,12 @@
                     }
                 }
             } catch (error) {
-                setMood('surprised', 'Bir hata oluştu!');
-                answerDiv.innerHTML = '<p style="color:red;">Hata: API çalışmıyor olabilir.</p>';
+                setMood('surprised', 'Bir hata oluÅŸtu!');
+                answerDiv.innerHTML = '<p style="color:red;">Hata: API Ã§alÄ±ÅŸmÄ±yor olabilir.</p>';
             }
         }
 
-        // ── SEVİYE UYARLAMA ──
+        // â”€â”€ SEVÄ°YE UYARLAMA â”€â”€
         async function simplifyText() {
             if (!currentPageText) return;
             const level = document.getElementById('targetLevel').value;
@@ -1362,15 +1362,15 @@
                 const data = await response.json();
 
                 let html = `<div class="result-box">`;
-                html += `<p><span class="level-badge">${data.level}</span> Seviyesine Uyarlanmış Metin:</p>`;
+                html += `<p><span class="level-badge">${data.level}</span> Seviyesine UyarlanmÄ±ÅŸ Metin:</p>`;
                 html += `<div class="simplified-box">${data.simplified_text}</div>`;
 
                 if (data.audio_path) {
-                    html += `<button class="btn btn-primary btn-inline" style="margin-top:12px;" onclick="new Audio('${API}${data.audio_path}').play()">🔊 Dinle</button>`;
+                    html += `<button class="btn btn-primary btn-inline" style="margin-top:12px;" onclick="new Audio('${API}${data.audio_path}').play()">ğŸ”Š Dinle</button>`;
                 }
 
                 if (data.vocabulary_notes && data.vocabulary_notes.length > 0) {
-                    html += `<p style="margin-top:16px;"><strong>📖 Kelime Notları:</strong></p>`;
+                    html += `<p style="margin-top:16px;"><strong>ğŸ“– Kelime NotlarÄ±:</strong></p>`;
                     data.vocabulary_notes.forEach(v => {
                         html += `<span class="vocab-chip"><strong>${v.word}</strong>: ${v.meaning}</span> `;
                     });
@@ -1383,17 +1383,17 @@
                 html += `</div>`;
                 resultDiv.innerHTML = html;
 
-                // Telaffuz referans metnini güncelle
+                // Telaffuz referans metnini gÃ¼ncelle
                 if (data.simplified_text) {
                     currentReferenceText = data.simplified_text.substring(0, 500);
                     document.getElementById('pronReferenceText').textContent = currentReferenceText;
                 }
             } catch (error) {
-                resultDiv.innerHTML = '<p style="color:red;">Hata oluştu. Lütfen tekrar deneyin.</p>';
+                resultDiv.innerHTML = '<p style="color:red;">Hata oluÅŸtu. LÃ¼tfen tekrar deneyin.</p>';
             }
         }
 
-        // ── MİKROFON KAYIT ──
+        // â”€â”€ MÄ°KROFON KAYIT â”€â”€
         async function toggleRecording() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
@@ -1408,24 +1408,24 @@
                 mediaRecorder.onstop = () => {
                     stream.getTracks().forEach(t => t.stop());
                     recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    document.getElementById('btnRecord').textContent = '🎙️ Tekrar Kaydet';
+                    document.getElementById('btnRecord').textContent = 'ğŸ™ï¸ Tekrar Kaydet';
                     document.getElementById('recordingStatus').style.display = 'none';
                     document.getElementById('btnSendPron').style.display = 'block';
                 };
 
                 mediaRecorder.start();
-                document.getElementById('btnRecord').textContent = '⏹️ Kaydı Durdur';
+                document.getElementById('btnRecord').textContent = 'â¹ï¸ KaydÄ± Durdur';
                 document.getElementById('recordingStatus').style.display = 'block';
                 document.getElementById('btnSendPron').style.display = 'none';
                 setTimeout(() => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
                 }, 30000);
             } catch (err) {
-                alert('Mikrofon erişimi reddedildi.');
+                alert('Mikrofon eriÅŸimi reddedildi.');
             }
         }
 
-        // ── TELAFFUZ GÖNDER ──
+        // â”€â”€ TELAFFUZ GÃ–NDER â”€â”€
         async function sendPronunciation() {
             if (!recordedBlob) return;
             const resultDiv = document.getElementById('pronResult');
@@ -1445,12 +1445,12 @@
 
                 let html = `<h2>Telaffuz Sonucu</h2>`;
                 html += `<p>Puan: <span class="score-badge ${scoreClass}">${data.score}/10</span>`;
-                html += ` &nbsp; Doğruluk: <strong>${data.accuracy_percent || 0}%</strong></p>`;
+                html += ` &nbsp; DoÄŸruluk: <strong>${data.accuracy_percent || 0}%</strong></p>`;
 
                 if (data.mispronounced_words && data.mispronounced_words.length > 0) {
-                    html += `<p><strong>Yanlış Telaffuz Edilen Kelimeler:</strong></p>`;
+                    html += `<p><strong>YanlÄ±ÅŸ Telaffuz Edilen Kelimeler:</strong></p>`;
                     data.mispronounced_words.forEach(w => {
-                        html += `<span class="word-chip word-wrong"><strong>${w.word}</strong> → "${w.spoken_as}"<br><small>${w.tip}</small></span> `;
+                        html += `<span class="word-chip word-wrong"><strong>${w.word}</strong> â†’ "${w.spoken_as}"<br><small>${w.tip}</small></span> `;
                     });
                 }
 
@@ -1459,17 +1459,17 @@
                     data.skipped_words.forEach(w => { html += `<span class="word-chip word-skip">${w}</span> `; });
                 }
 
-                html += `<p style="margin-top:16px;"><strong>Akıcılık:</strong> ${data.fluency_feedback || ''}</p>`;
-                html += `<p><strong>Genel Değerlendirme:</strong> ${data.overall_feedback || ''}</p>`;
+                html += `<p style="margin-top:16px;"><strong>AkÄ±cÄ±lÄ±k:</strong> ${data.fluency_feedback || ''}</p>`;
+                html += `<p><strong>Genel DeÄŸerlendirme:</strong> ${data.overall_feedback || ''}</p>`;
 
                 if (data.feedback_audio) {
-                    html += `<button class="btn btn-primary btn-inline" onclick="new Audio('${API}${data.feedback_audio}').play()">🔊 Geri Bildirimi Dinle</button>`;
+                    html += `<button class="btn btn-primary btn-inline" onclick="new Audio('${API}${data.feedback_audio}').play()">ğŸ”Š Geri Bildirimi Dinle</button>`;
                 }
 
-                html += `<p style="margin-top:12px; color:#666;"><em>Sizin okumanız: "${data.transcript || ''}"</em></p>`;
+                html += `<p style="margin-top:12px; color:#666;"><em>Sizin okumanÄ±z: "${data.transcript || ''}"</em></p>`;
                 resultDiv.innerHTML = html;
             } catch (error) {
-                resultDiv.innerHTML = '<p style="color:red;">Hata oluştu. Lütfen tekrar deneyin.</p>';
+                resultDiv.innerHTML = '<p style="color:red;">Hata oluÅŸtu. LÃ¼tfen tekrar deneyin.</p>';
             }
         }
 
@@ -1477,7 +1477,7 @@
             if (e.key === 'Enter') askQuestion();
         });
 
-        // ── SİMÜLASYON ──
+        // â”€â”€ SÄ°MÃœLASYON â”€â”€
         let simData = null, simCurrentStep = -1, simAnimId = null, simDrawFn = null;
 
         async function generateSimulation() {
@@ -1485,7 +1485,7 @@
             const resultDiv = document.getElementById('simResult');
             resultDiv.style.display = 'block';
             resultDiv.innerHTML = SKL.cards;
-            setMood('excited', 'Deney hazırlanıyor!');
+            setMood('excited', 'Deney hazÄ±rlanÄ±yor!');
             document.getElementById('labCanvas').style.display = 'none';
             document.getElementById('simStepInfo').style.display = 'none';
 
@@ -1498,10 +1498,10 @@
                 simData = await r.json();
                 simCurrentStep = -1;
                 initSimCanvas();
-                // Otomatik ilk adımı başlat
+                // Otomatik ilk adÄ±mÄ± baÅŸlat
                 setTimeout(() => simNextStep(), 300);
             } catch(e) {
-                resultDiv.innerHTML = '<p style="color:red;">Simülasyon oluşturulamadı.</p>';
+                resultDiv.innerHTML = '<p style="color:red;">SimÃ¼lasyon oluÅŸturulamadÄ±.</p>';
             }
         }
 
@@ -1514,7 +1514,7 @@
                     simDrawFn = eval(wrapped);
                 }
             } catch(e) { 
-                console.error('Canvas kodu hatası:', e, simData.canvas_code?.substring(0,200));
+                console.error('Canvas kodu hatasÄ±:', e, simData.canvas_code?.substring(0,200));
                 simDrawFn = null; 
             }
             renderSimUI();
@@ -1524,67 +1524,67 @@
             const d = simData;
             const totalSteps = d.total_steps || (d.steps||[]).length;
             let html = `<div class="result-box">`;
-            html += `<h2>${d.title || 'Deney Simülasyonu'}</h2>`;
+            html += `<h2>${d.title || 'Deney SimÃ¼lasyonu'}</h2>`;
             if (d.topic) html += `<p><strong>Konu:</strong> ${d.topic} | <strong>Ders:</strong> ${d.subject || ''}</p>`;
             if (d.description) html += `<p>${d.description}</p>`;
 
             // Malzemeler
             if (d.materials && d.materials.length) {
-                html += `<h2 style="margin-top:12px;">🧰 Malzemeler</h2><div class="sim-materials">`;
-                d.materials.forEach(m => html += `<span class="sim-mat-chip">${m.icon||'📦'} ${m.name}${m.quantity?' ('+m.quantity+')':''}</span>`);
+                html += `<h2 style="margin-top:12px;">ğŸ§° Malzemeler</h2><div class="sim-materials">`;
+                d.materials.forEach(m => html += `<span class="sim-mat-chip">${m.icon||'ğŸ“¦'} ${m.name}${m.quantity?' ('+m.quantity+')':''}</span>`);
                 html += `</div>`;
             }
-            // Güvenlik
+            // GÃ¼venlik
             if (d.safety && d.safety.length) {
                 html += `<div class="sim-safety">`;
-                d.safety.forEach(s => html += `<p>${s.icon||'⚠️'} <strong>${s.warning}</strong></p>`);
+                d.safety.forEach(s => html += `<p>${s.icon||'âš ï¸'} <strong>${s.warning}</strong></p>`);
                 html += `</div>`;
             }
 
             // Kontroller
             html += `<div class="sim-controls">`;
             if (simCurrentStep < totalSteps - 1) {
-                html += `<button class="btn btn-success" onclick="simNextStep()">Sonraki Adım ▶</button>`;
+                html += `<button class="btn btn-success" onclick="simNextStep()">Sonraki AdÄ±m â–¶</button>`;
             }
             if (simCurrentStep >= totalSteps - 1 && totalSteps > 0) {
-                html += `<button class="btn btn-primary" onclick="simReplay()">🔄 Tekrar Oynat</button>`;
+                html += `<button class="btn btn-primary" onclick="simReplay()">ğŸ”„ Tekrar Oynat</button>`;
             }
             html += `</div>`;
 
-            // Sonuç
+            // SonuÃ§
             if (simCurrentStep >= totalSteps - 1 && d.result) {
                 const res = d.result;
-                html += `<div class="sim-result"><h2>🎯 Sonuç</h2>`;
+                html += `<div class="sim-result"><h2>ğŸ¯ SonuÃ§</h2>`;
                 if (res.what_happened) html += `<p><strong>Ne oldu?</strong> ${res.what_happened}</p>`;
                 if (res.why) html += `<p><strong>Neden oldu?</strong> ${res.why}</p>`;
-                if (res.formula) html += `<p><strong>Formül:</strong> <code>${res.formula}</code></p>`;
-                if (res.real_life) html += `<p><strong>🌍 Günlük Hayat:</strong> ${res.real_life}</p>`;
-                if (d.result_audio) html += `<button class="btn btn-primary btn-inline" style="margin-top:8px;" onclick="new Audio('${API}${d.result_audio}').play()">🔊 Sonucu Dinle</button>`;
+                if (res.formula) html += `<p><strong>FormÃ¼l:</strong> <code>${res.formula}</code></p>`;
+                if (res.real_life) html += `<p><strong>ğŸŒ GÃ¼nlÃ¼k Hayat:</strong> ${res.real_life}</p>`;
+                if (d.result_audio) html += `<button class="btn btn-primary btn-inline" style="margin-top:8px;" onclick="new Audio('${API}${d.result_audio}').play()">ğŸ”Š Sonucu Dinle</button>`;
                 html += `</div>`;
                 const cr = d.chemical_reaction;
                 if (cr && cr.has_reaction && cr.equation) {
-                    html += `<div class="sim-reaction"><strong>⚗️ ${cr.type||'Kimyasal Reaksiyon'}</strong><br><br><span style="font-size:20px;">${cr.equation}</span></div>`;
+                    html += `<div class="sim-reaction"><strong>âš—ï¸ ${cr.type||'Kimyasal Reaksiyon'}</strong><br><br><span style="font-size:20px;">${cr.equation}</span></div>`;
                 }
-                html += `<button class="btn btn-orange btn-inline" style="margin-top:12px;" onclick="downloadSimPDF()">📄 Deney Raporu İndir</button>`;
+                html += `<button class="btn btn-orange btn-inline" style="margin-top:12px;" onclick="downloadSimPDF()">ğŸ“„ Deney Raporu Ä°ndir</button>`;
             }
 
             if (d.error) html += `<p style="color:#856404;margin-top:10px;"><em>${d.error}</em></p>`;
             html += `</div>`;
             document.getElementById('simResult').innerHTML = html;
 
-            // Canvas göster ve çiz
+            // Canvas gÃ¶ster ve Ã§iz
             if (simDrawFn && simCurrentStep >= 0) {
                 const canvas = document.getElementById('labCanvas');
                 canvas.style.display = 'block';
                 startSimAnimation();
-                // Adım bilgisi
+                // AdÄ±m bilgisi
                 const stepData = (d.steps||[])[simCurrentStep];
                 if (stepData) {
                     const info = document.getElementById('simStepInfo');
                     info.style.display = 'block';
                     let sh = `<strong>${stepData.title}</strong><p>${stepData.description}</p>`;
-                    if (stepData.observation) sh += `<p style="color:#555;font-style:italic;">👁️ ${stepData.observation}</p>`;
-                    if (stepData.audio_path) sh += `<button class="v-audio-btn" onclick="new Audio('${API}${stepData.audio_path}').play()">🔊</button>`;
+                    if (stepData.observation) sh += `<p style="color:#555;font-style:italic;">ğŸ‘ï¸ ${stepData.observation}</p>`;
+                    if (stepData.audio_path) sh += `<button class="v-audio-btn" onclick="new Audio('${API}${stepData.audio_path}').play()">ğŸ”Š</button>`;
                     info.innerHTML = sh;
                 }
             }
@@ -1595,14 +1595,14 @@
             const canvas = document.getElementById('labCanvas');
             const ctx = canvas.getContext('2d');
             function loop() {
-                // Her frame'de canvas'ı tamamen temizle
+                // Her frame'de canvas'Ä± tamamen temizle
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 if (simDrawFn) {
                     try {
                         ctx.save();
                         simDrawFn(ctx, canvas.width, simCurrentStep);
                         ctx.restore();
-                    } catch(e) { console.error('Canvas çizim hatası:', e); }
+                    } catch(e) { console.error('Canvas Ã§izim hatasÄ±:', e); }
                 }
                 simAnimId = requestAnimationFrame(loop);
             }
@@ -1652,34 +1652,34 @@
                 content.push({ ul: matList, margin: [10, 4, 0, 10] });
             }
 
-            // Güvenlik
+            // GÃ¼venlik
             if (d.safety && d.safety.length) {
-                content.push({ text: '⚠️ GÜVENLİK UYARILARI', style: 'sectionTitle', color: '#dc3545' });
+                content.push({ text: 'âš ï¸ GÃœVENLÄ°K UYARILARI', style: 'sectionTitle', color: '#dc3545' });
                 d.safety.forEach(s => content.push({ text: `${s.icon || ''} ${s.warning}`, margin: [10, 2, 0, 2], color: '#dc3545' }));
                 content.push({ text: '', margin: [0, 6, 0, 0] });
             }
 
-            // Adımlar
+            // AdÄ±mlar
             content.push({ text: 'DENEY ADIMLARI', style: 'sectionTitle' });
             (d.steps || []).forEach(s => {
                 content.push({ text: `${s.step || ''}. ${s.title}`, bold: true, margin: [0, 6, 0, 2] });
                 content.push({ text: s.description, margin: [10, 0, 0, 2] });
-                if (s.observation) content.push({ text: `Gözlem: ${s.observation}`, italics: true, color: '#555', margin: [10, 0, 0, 4] });
+                if (s.observation) content.push({ text: `GÃ¶zlem: ${s.observation}`, italics: true, color: '#555', margin: [10, 0, 0, 4] });
             });
 
-            // Sonuç
+            // SonuÃ§
             if (d.result) {
-                content.push({ text: 'SONUÇ', style: 'sectionTitle', margin: [0, 14, 0, 4] });
+                content.push({ text: 'SONUÃ‡', style: 'sectionTitle', margin: [0, 14, 0, 4] });
                 if (d.result.what_happened) content.push({ text: `Ne oldu? ${d.result.what_happened}`, margin: [10, 2, 0, 2] });
                 if (d.result.why) content.push({ text: `Neden? ${d.result.why}`, margin: [10, 2, 0, 2] });
-                if (d.result.formula) content.push({ text: `Formül: ${d.result.formula}`, margin: [10, 2, 0, 2], bold: true });
-                if (d.result.real_life) content.push({ text: `Günlük Hayat: ${d.result.real_life}`, margin: [10, 2, 0, 2] });
+                if (d.result.formula) content.push({ text: `FormÃ¼l: ${d.result.formula}`, margin: [10, 2, 0, 2], bold: true });
+                if (d.result.real_life) content.push({ text: `GÃ¼nlÃ¼k Hayat: ${d.result.real_life}`, margin: [10, 2, 0, 2] });
             }
 
             // Reaksiyon
             const cr = d.chemical_reaction;
             if (cr && cr.has_reaction && cr.equation) {
-                content.push({ text: 'KİMYASAL REAKSİYON', style: 'sectionTitle', margin: [0, 14, 0, 4] });
+                content.push({ text: 'KÄ°MYASAL REAKSÄ°YON', style: 'sectionTitle', margin: [0, 14, 0, 4] });
                 content.push({ text: cr.equation, fontSize: 14, bold: true, alignment: 'center', margin: [0, 4, 0, 4] });
                 if (cr.type) content.push({ text: `Reaksiyon Tipi: ${cr.type}`, margin: [10, 2, 0, 2] });
             }
@@ -1695,10 +1695,10 @@
             }).download('deney_raporu.pdf');
         }
 
-        // ── QUIZ ──
+        // â”€â”€ QUIZ â”€â”€
         let lastQuizData = null;
 
-        // ── VOCABULARY ──
+        // â”€â”€ VOCABULARY â”€â”€
         async function extractVocabulary() {
             if (!currentPageText) return;
             const level = document.getElementById('vocabLevel').value;
@@ -1715,7 +1715,7 @@
                 const data = await response.json();
 
                 let html = `<div class="result-box">`;
-                html += `<h2>📖 Kelime Listesi (${data.target_level})</h2>`;
+                html += `<h2>ğŸ“– Kelime Listesi (${data.target_level})</h2>`;
                 html += `<p>${(data.words||[]).length} kelime bulundu</p>`;
 
                 (data.words || []).forEach(w => {
@@ -1724,17 +1724,17 @@
                     html += `<span class="v-word">${w.word}</span>`;
                     if (w.pos) html += `<span class="v-pos">(${w.pos})</span>`;
                     if (w.level) html += `<span class="v-level ${lvClass}">${w.level}</span>`;
-                    if (w.audio_path) html += ` <button class="v-audio-btn" onclick="new Audio('${API}${w.audio_path}').play()">🔊</button>`;
+                    if (w.audio_path) html += ` <button class="v-audio-btn" onclick="new Audio('${API}${w.audio_path}').play()">ğŸ”Š</button>`;
                     if (w.definition) html += `<div class="v-def">${w.definition}</div>`;
-                    if (w.turkish) html += `<div class="v-tr">🇹🇷 ${w.turkish}</div>`;
-                    if (w.example) html += `<div class="v-ex">“${w.example}”</div>`;
+                    if (w.turkish) html += `<div class="v-tr">ğŸ‡¹ğŸ‡· ${w.turkish}</div>`;
+                    if (w.example) html += `<div class="v-ex">â€œ${w.example}â€</div>`;
                     html += `</div>`;
                 });
 
                 html += `</div>`;
                 resultDiv.innerHTML = html;
             } catch (error) {
-                resultDiv.innerHTML = '<p style="color:red;">Hata oluştu. Lütfen tekrar deneyin.</p>';
+                resultDiv.innerHTML = '<p style="color:red;">Hata oluÅŸtu. LÃ¼tfen tekrar deneyin.</p>';
             }
         }
 
@@ -1767,23 +1767,23 @@
                 (data.questions || []).forEach((q, i) => {
                     html += `<div class="quiz-q">`;
                     if (q.type === 'multiple_choice') {
-                        html += `<span class="q-type type-mc">Çoktan Seçmeli</span>`;
+                        html += `<span class="q-type type-mc">Ã‡oktan SeÃ§meli</span>`;
                         html += `<strong>${i+1}. ${q.question}</strong>`;
                         (q.options || []).forEach(o => { html += `<div class="quiz-option">${o}</div>`; });
-                        html += `<details><summary>Cevabı Gör</summary><div class="answer-text"><strong>Doğru: ${q.correct}</strong><br>${q.explanation || ''}</div></details>`;
+                        html += `<details><summary>CevabÄ± GÃ¶r</summary><div class="answer-text"><strong>DoÄŸru: ${q.correct}</strong><br>${q.explanation || ''}</div></details>`;
                     } else if (q.type === 'fill_blank') {
-                        html += `<span class="q-type type-fb">Boşluk Doldurma</span>`;
+                        html += `<span class="q-type type-fb">BoÅŸluk Doldurma</span>`;
                         html += `<strong>${i+1}. ${q.question}</strong>`;
-                        html += `<details><summary>Cevabı Gör</summary><div class="answer-text"><strong>${q.correct}</strong><br>${q.explanation || ''}</div></details>`;
+                        html += `<details><summary>CevabÄ± GÃ¶r</summary><div class="answer-text"><strong>${q.correct}</strong><br>${q.explanation || ''}</div></details>`;
                     } else if (q.type === 'matching') {
-                        html += `<span class="q-type type-match">Eşleştirme</span>`;
+                        html += `<span class="q-type type-match">EÅŸleÅŸtirme</span>`;
                         html += `<strong>${i+1}. ${q.question}</strong>`;
                         html += `<table class="match-table">`;
                         (q.pairs || []).forEach(p => {
                             html += `<tr><td><strong>${p.left}</strong></td><td>???</td></tr>`;
                         });
                         html += `</table>`;
-                        html += `<details><summary>Cevabı Gör</summary><div class="answer-text"><table class="match-table">`;
+                        html += `<details><summary>CevabÄ± GÃ¶r</summary><div class="answer-text"><table class="match-table">`;
                         (q.pairs || []).forEach(p => {
                             html += `<tr><td><strong>${p.left}</strong></td><td>${p.right}</td></tr>`;
                         });
@@ -1792,12 +1792,12 @@
                     html += `</div>`;
                 });
 
-                html += `<button class="btn btn-orange btn-inline" style="margin-top:16px;" onclick="downloadQuizPDF()">📄 PDF İndir (Sınav Kağıdı)</button>`;
-                html += ` <button class="btn btn-primary btn-inline" style="margin-top:16px;" onclick="downloadQuizPDF(true)">📄 PDF İndir (Cevap Anahtarı)</button>`;
+                html += `<button class="btn btn-orange btn-inline" style="margin-top:16px;" onclick="downloadQuizPDF()">ğŸ“„ PDF Ä°ndir (SÄ±nav KaÄŸÄ±dÄ±)</button>`;
+                html += ` <button class="btn btn-primary btn-inline" style="margin-top:16px;" onclick="downloadQuizPDF(true)">ğŸ“„ PDF Ä°ndir (Cevap AnahtarÄ±)</button>`;
                 html += `</div>`;
                 resultDiv.innerHTML = html;
             } catch (error) {
-                resultDiv.innerHTML = '<p style="color:red;">Hata oluştu. Lütfen tekrar deneyin.</p>';
+                resultDiv.innerHTML = '<p style="color:red;">Hata oluÅŸtu. LÃ¼tfen tekrar deneyin.</p>';
             }
         }
 
@@ -1853,7 +1853,7 @@
             pdfMake.createPdf(docDef).download(filename);
         }
 
-        // ── DIALOGUE ──
+        // â”€â”€ DIALOGUE â”€â”€
         let dlgState = { scenario: '', level: 'B1', history: [] };
         let dlgRecorder = null, dlgChunks = [], dlgBlob = null;
 
@@ -1863,7 +1863,7 @@
                 const data = await r.json();
                 const sel = document.getElementById('dlgScenario');
                 (data.scenarios || []).forEach(s => {
-                    sel.innerHTML += `<option value="${s.id}">${s.title} (👤 ${s.student_role})</option>`;
+                    sel.innerHTML += `<option value="${s.id}">${s.title} (ğŸ‘¤ ${s.student_role})</option>`;
                 });
             } catch(e) {}
         }
@@ -1872,8 +1872,8 @@
         function addChatMsg(role, text, audioUrl) {
             const box = document.getElementById('dlgChatBox');
             const cls = role === 'ai' ? 'chat-ai' : 'chat-student';
-            const label = role === 'ai' ? '🤖 AI' : '👤 Sen';
-            const audioBtn = audioUrl ? ` <button class="v-audio-btn" onclick="new Audio('${API}${audioUrl}').play()">🔊</button>` : '';
+            const label = role === 'ai' ? 'ğŸ¤– AI' : 'ğŸ‘¤ Sen';
+            const audioBtn = audioUrl ? ` <button class="v-audio-btn" onclick="new Audio('${API}${audioUrl}').play()">ğŸ”Š</button>` : '';
             box.innerHTML += `<div class="chat-msg ${cls}"><div class="chat-role">${label}${audioBtn}</div>${text}</div>`;
             box.scrollTop = box.scrollHeight;
         }
@@ -1901,7 +1901,7 @@
                 addChatMsg('ai', data.ai_message, data.ai_audio);
                 new Audio(`${API}${data.ai_audio}`).play();
             } catch(e) {
-                document.getElementById('dlgChatBox').innerHTML = '<p style="color:red;">Başlatılamadı.</p>';
+                document.getElementById('dlgChatBox').innerHTML = '<p style="color:red;">BaÅŸlatÄ±lamadÄ±.</p>';
             }
         }
 
@@ -1915,22 +1915,22 @@
                 dlgRecorder.onstop = () => {
                     stream.getTracks().forEach(t => t.stop());
                     dlgBlob = new Blob(dlgChunks, { type: 'audio/webm' });
-                    document.getElementById('dlgRecordBtn').textContent = '🎙️ Tekrar Konuş';
+                    document.getElementById('dlgRecordBtn').textContent = 'ğŸ™ï¸ Tekrar KonuÅŸ';
                     document.getElementById('dlgRecStatus').style.display = 'none';
                     document.getElementById('dlgSendBtn').style.display = 'block';
                 };
                 dlgRecorder.start();
-                document.getElementById('dlgRecordBtn').textContent = '⏹️ Durdur';
+                document.getElementById('dlgRecordBtn').textContent = 'â¹ï¸ Durdur';
                 document.getElementById('dlgRecStatus').style.display = 'block';
                 document.getElementById('dlgSendBtn').style.display = 'none';
                 setTimeout(() => { if (dlgRecorder && dlgRecorder.state === 'recording') dlgRecorder.stop(); }, 30000);
-            } catch(e) { alert('Mikrofon erişimi reddedildi.'); }
+            } catch(e) { alert('Mikrofon eriÅŸimi reddedildi.'); }
         }
 
         async function dlgSend() {
             if (!dlgBlob) return;
             document.getElementById('dlgSendBtn').style.display = 'none';
-            addChatMsg('student', '…', '');
+            addChatMsg('student', 'â€¦', '');
 
             const fd = new FormData();
             fd.append('audio', dlgBlob, 'dlg.webm');
@@ -1943,9 +1943,9 @@
                 const data = await r.json();
                 dlgState.history = data.history;
 
-                // Öğrenci mesajını güncelle
+                // Ã–ÄŸrenci mesajÄ±nÄ± gÃ¼ncelle
                 const msgs = document.getElementById('dlgChatBox').querySelectorAll('.chat-student');
-                if (msgs.length) msgs[msgs.length - 1].innerHTML = `<div class="chat-role">👤 Sen</div>${data.student_text}`;
+                if (msgs.length) msgs[msgs.length - 1].innerHTML = `<div class="chat-role">ğŸ‘¤ Sen</div>${data.student_text}`;
 
                 addChatMsg('ai', data.ai_message, data.ai_audio);
                 new Audio(`${API}${data.ai_audio}`).play();
@@ -1956,42 +1956,42 @@
                     document.getElementById('dlgRecordBtn').style.display = 'none';
                 }
             } catch(e) {
-                addChatMsg('ai', 'Bir hata oluştu, tekrar deneyin.', '');
+                addChatMsg('ai', 'Bir hata oluÅŸtu, tekrar deneyin.', '');
             }
         }
 
         function showDialogueEval(ev) {
             const div = document.getElementById('dlgEvaluation');
             div.style.display = 'block';
-            let html = `<div class="result-box"><h2>🌟 Diyalog Değerlendirmesi</h2>`;
+            let html = `<div class="result-box"><h2>ğŸŒŸ Diyalog DeÄŸerlendirmesi</h2>`;
             html += `<div class="eval-grid">`;
             html += `<div class="eval-item"><div class="eval-score">${ev.score || 0}</div><div class="eval-label">Genel</div></div>`;
             html += `<div class="eval-item"><div class="eval-score">${ev.grammar_score || 0}</div><div class="eval-label">Gramer</div></div>`;
             html += `<div class="eval-item"><div class="eval-score">${ev.vocabulary_score || 0}</div><div class="eval-label">Kelime</div></div>`;
-            html += `<div class="eval-item"><div class="eval-score">${ev.fluency_score || 0}</div><div class="eval-label">Akıcılık</div></div>`;
+            html += `<div class="eval-item"><div class="eval-score">${ev.fluency_score || 0}</div><div class="eval-label">AkÄ±cÄ±lÄ±k</div></div>`;
             html += `</div>`;
             if (ev.strengths && ev.strengths.length) {
-                html += `<p><strong>✅ Güçlü Yanlar:</strong></p>`;
+                html += `<p><strong>âœ… GÃ¼Ã§lÃ¼ Yanlar:</strong></p>`;
                 ev.strengths.forEach(s => { html += `<span class="chip-green">${s}</span> `; });
             }
             if (ev.improvements && ev.improvements.length) {
-                html += `<p style="margin-top:8px;"><strong>💡 Geliştirilebilir:</strong></p>`;
+                html += `<p style="margin-top:8px;"><strong>ğŸ’¡ GeliÅŸtirilebilir:</strong></p>`;
                 ev.improvements.forEach(s => { html += `<span class="chip-yellow">${s}</span> `; });
             }
-            if (ev.feedback_tr) html += `<p style="margin-top:12px;"><strong>Değerlendirme:</strong> ${ev.feedback_tr}</p>`;
-            if (ev.feedback_audio) html += `<button class="btn btn-primary btn-inline" style="margin-top:8px;" onclick="new Audio('${API}${ev.feedback_audio}').play()">🔊 Dinle</button>`;
-            html += `<br><button class="btn btn-success btn-inline" style="margin-top:12px;" onclick="document.getElementById('dlgRecordBtn').style.display='block'; document.getElementById('dlgEvaluation').style.display='none'; startDialogue()">🔄 Yeni Diyalog</button>`;
+            if (ev.feedback_tr) html += `<p style="margin-top:12px;"><strong>DeÄŸerlendirme:</strong> ${ev.feedback_tr}</p>`;
+            if (ev.feedback_audio) html += `<button class="btn btn-primary btn-inline" style="margin-top:8px;" onclick="new Audio('${API}${ev.feedback_audio}').play()">ğŸ”Š Dinle</button>`;
+            html += `<br><button class="btn btn-success btn-inline" style="margin-top:12px;" onclick="document.getElementById('dlgRecordBtn').style.display='block'; document.getElementById('dlgEvaluation').style.display='none'; startDialogue()">ğŸ”„ Yeni Diyalog</button>`;
             html += `</div>`;
             div.innerHTML = html;
         }
 
-        // ── RAPOR ──
+        // â”€â”€ RAPOR â”€â”€
         async function loadStudentList() {
             try {
                 const r = await fetch(`${API}/english/students`);
                 const data = await r.json();
                 const sel = document.getElementById('reportStudent');
-                sel.innerHTML = '<option value="">Öğrenci seçin...</option>';
+                sel.innerHTML = '<option value="">Ã–ÄŸrenci seÃ§in...</option>';
                 (data.students || []).forEach(s => {
                     sel.innerHTML += `<option value="${s}">${s}</option>`;
                 });
@@ -2000,9 +2000,9 @@
         loadStudentList();
 
         function trendIcon(trend) {
-            if (trend === 'improving') return '<span class="trend-up">↑ Yükseliyor</span>';
-            if (trend === 'declining') return '<span class="trend-down">↓ Düşüş</span>';
-            return '<span class="trend-stable">→ Sabit</span>';
+            if (trend === 'improving') return '<span class="trend-up">â†‘ YÃ¼kseliyor</span>';
+            if (trend === 'declining') return '<span class="trend-down">â†“ DÃ¼ÅŸÃ¼ÅŸ</span>';
+            return '<span class="trend-stable">â†’ Sabit</span>';
         }
 
         async function loadReport() {
@@ -2014,24 +2014,24 @@
 
             try {
                 const r = await fetch(`${API}/english/report/${encodeURIComponent(name)}`);
-                if (!r.ok) { resultDiv.innerHTML = '<p style="color:red;">Kayıt bulunamadı.</p>'; return; }
+                if (!r.ok) { resultDiv.innerHTML = '<p style="color:red;">KayÄ±t bulunamadÄ±.</p>'; return; }
                 const d = await r.json();
 
-                let html = `<div class="result-box"><h2>📊 ${d.student_name}</h2>`;
+                let html = `<div class="result-box"><h2>ğŸ“Š ${d.student_name}</h2>`;
                 html += `<div class="stat-card"><span class="stat-value">${d.total_activities}</span><span class="stat-label">Toplam Aktivite</span></div>`;
 
                 // Telaffuz istatistikleri
                 const p = d.pronunciation;
                 if (p && p.count > 0) {
-                    html += `<h2 style="margin-top:20px;">🎙️ Telaffuz</h2>`;
+                    html += `<h2 style="margin-top:20px;">ğŸ™ï¸ Telaffuz</h2>`;
                     html += `<div class="stat-card"><span class="stat-value">${p.avg_score}</span><span class="stat-label">Ort. Puan</span></div>`;
-                    html += `<div class="stat-card"><span class="stat-value">${p.best_score}</span><span class="stat-label">En Yüksek</span></div>`;
-                    html += `<div class="stat-card"><span class="stat-value">${p.avg_accuracy}%</span><span class="stat-label">Ort. Doğruluk</span></div>`;
-                    html += `<div class="stat-card"><span class="stat-value">${p.count}</span><span class="stat-label">Test Sayısı</span></div>`;
+                    html += `<div class="stat-card"><span class="stat-value">${p.best_score}</span><span class="stat-label">En YÃ¼ksek</span></div>`;
+                    html += `<div class="stat-card"><span class="stat-value">${p.avg_accuracy}%</span><span class="stat-label">Ort. DoÄŸruluk</span></div>`;
+                    html += `<div class="stat-card"><span class="stat-value">${p.count}</span><span class="stat-label">Test SayÄ±sÄ±</span></div>`;
                     html += `<p style="margin-top:10px;">Trend: ${trendIcon(p.trend)}</p>`;
 
                     if (p.weak_words && p.weak_words.length > 0) {
-                        html += `<p style="margin-top:12px;"><strong>Zayıf Kelimeler:</strong></p>`;
+                        html += `<p style="margin-top:12px;"><strong>ZayÄ±f Kelimeler:</strong></p>`;
                         p.weak_words.forEach(w => {
                             html += `<span class="word-chip word-wrong"><strong>${w.word}</strong> (${w.count}x)</span> `;
                         });
@@ -2041,16 +2041,16 @@
                 // Cevap istatistikleri
                 const a = d.answers;
                 if (a && a.count > 0) {
-                    html += `<h2 style="margin-top:20px;">✍️ Cevap Değerlendirme</h2>`;
+                    html += `<h2 style="margin-top:20px;">âœï¸ Cevap DeÄŸerlendirme</h2>`;
                     html += `<div class="stat-card"><span class="stat-value">${a.avg_score}</span><span class="stat-label">Ort. Puan</span></div>`;
-                    html += `<div class="stat-card"><span class="stat-value">${a.best_score}</span><span class="stat-label">En Yüksek</span></div>`;
-                    html += `<div class="stat-card"><span class="stat-value">${a.count}</span><span class="stat-label">Cevap Sayısı</span></div>`;
+                    html += `<div class="stat-card"><span class="stat-value">${a.best_score}</span><span class="stat-label">En YÃ¼ksek</span></div>`;
+                    html += `<div class="stat-card"><span class="stat-value">${a.count}</span><span class="stat-label">Cevap SayÄ±sÄ±</span></div>`;
                     html += `<p>Trend: ${trendIcon(a.trend)}</p>`;
                 }
 
-                // Zaman çizelgesi
+                // Zaman Ã§izelgesi
                 if (d.timeline && d.timeline.length > 0) {
-                    html += `<h2 style="margin-top:20px;">📅 Zaman Çizelgesi</h2>`;
+                    html += `<h2 style="margin-top:20px;">ğŸ“… Zaman Ã‡izelgesi</h2>`;
                     html += `<div class="timeline-bar">`;
                     d.timeline.forEach(t => {
                         const h = Math.max(8, t.score * 8);
@@ -2058,15 +2058,17 @@
                         html += `<div class="timeline-col" style="height:${h}px; background:${color};" data-tip="${t.date} | ${t.type} | ${t.score}/10"></div>`;
                     });
                     html += `</div>`;
-                    html += `<p style="font-size:14px; color:#666;">🟡 Telaffuz &nbsp; 🟦 Cevap</p>`;
+                    html += `<p style="font-size:14px; color:#666;">ğŸŸ¡ Telaffuz &nbsp; ğŸŸ¦ Cevap</p>`;
                 }
 
                 html += `</div>`;
                 resultDiv.innerHTML = html;
             } catch (error) {
-                resultDiv.innerHTML = '<p style="color:red;">Rapor yüklenemedi.</p>';
+                resultDiv.innerHTML = '<p style="color:red;">Rapor yÃ¼klenemedi.</p>';
             }
         }
     </script>
 </body>
 </html>
+
+
