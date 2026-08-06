@@ -1023,11 +1023,20 @@
         }
 
         function formatAnswerText(text) {
-            return (text || '')
+            const normalized = (text || '')
                 .replace(/\r\n/g, '\n')
                 .replace(/[ \t]+\n/g, '\n')
                 .replace(/\n{2,}/g, '\n')
                 .trim();
+            const escaped = normalized
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+            return escaped
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
         }
 
         function getSupportedAudioMimeType() {
