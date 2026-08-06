@@ -288,7 +288,7 @@ async def robot_presence(req: PresenceSignal):
     session["asked_name"] = True
     session["last_seen"] = time.time()
     user_name = session.get("user_name", "")
-    answer = "Merhaba, okulumuza hos geldiniz. Bilgi almak icin Bilgi Al butonuna tiklayabilirsiniz."
+    answer = "Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz."
     response = make_audio_response(answer, req.session_id, user_name, face_state="happy")
     presence_events["latest"] = {
         "id": uuid.uuid4().hex,
@@ -424,8 +424,10 @@ async def ask_question(question: Question):
             except ValueError as e:
                 return Answer(answer=str(e), audio_path="")
 
-        # Normal okul sorusu
-        answer = rag_engine.ask(question.question)
+        # Personel / ogretmen / zumre sorularinda once kesin metin eslesmesi dene
+        answer = rag_engine.answer_staff_question(question.question)
+        if not answer:
+            answer = rag_engine.ask(question.question)
         if session.get("introduced"):
             answer = remove_repeated_intro(answer)
         else:
