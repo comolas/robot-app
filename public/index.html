@@ -729,6 +729,9 @@
         const PERSON_SCORE_THRESHOLD = 0.55;
         const PERSON_DETECTION_INTERVAL_MS = 700;
         const USE_BROWSER_CAMERA_PRESENCE = false;
+        const USE_PI_PRESENCE = false;
+        const AUTO_GREETING_INTERVAL_MS = 30000;
+        const AUTO_GREETING_TEXT = 'Merhaba okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.';
         let idleTimer = null;
         let appIsOpen = false;
         let presenceStream = null;
@@ -737,6 +740,7 @@
         let presenceLastStatusAt = 0;
         let presenceLoopStarted = false;
         let presenceMotionFrames = 0;
+        let autoGreetingTimer = null;
         let personModel = null;
         let personModelReady = false;
         let personModelFailed = false;
@@ -959,6 +963,18 @@
             } catch (e) {}
         }
 
+        function runAutoGreeting() {
+            if (appIsOpen) return;
+            setIdleFace('happy', 5000);
+            presenceLastGreetingAt = Date.now();
+            speakLocalGreeting(AUTO_GREETING_TEXT);
+        }
+
+        function startAutoGreetingTimer() {
+            if (autoGreetingTimer) return;
+            autoGreetingTimer = setInterval(runAutoGreeting, AUTO_GREETING_INTERVAL_MS);
+        }
+
         function speakLocalGreeting(text) {
             if (!window.speechSynthesis) return;
             const utterance = new SpeechSynthesisUtterance(text);
@@ -1100,8 +1116,11 @@
                 if (btn) btn.textContent = 'Tema';
                 showIdleScreen();
                 if (USE_BROWSER_CAMERA_PRESENCE) startPresenceCamera();
-                pollPiPresence();
-                setInterval(pollPiPresence, 1500);
+                if (USE_PI_PRESENCE) {
+                    pollPiPresence();
+                    setInterval(pollPiPresence, 1500);
+                }
+                startAutoGreetingTimer();
                 requestFullscreenMode();
                 ['click', 'keydown', 'touchstart', 'mousemove'].forEach(type => {
                     document.addEventListener(type, resetIdleTimer, { passive: true });
