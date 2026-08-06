@@ -230,7 +230,7 @@ def add_name_to_answer(answer: str, user_name: str) -> str:
 def remove_repeated_intro(answer: str) -> str:
     intro_markers = [
         "Ben Data Koleji Ovacık Mesleki ve Teknik Anadolu Lisesi'nin resmi tanıtım robotuyum.",
-        "Ben Data Koleji Ovacik Mesleki ve Teknik Anadolu Lisesi'nin resmi tanitim robotuyum.",
+        "Ben Data Koleji Ovacık Mesleki ve Teknik Anadolu Lisesi'nin resmi tanıtım robotuyum.",
     ]
     cleaned = answer.strip()
     for marker in intro_markers:
@@ -239,7 +239,7 @@ def remove_repeated_intro(answer: str) -> str:
             break
     followups = [
         "Okulumuz hakkında talep ettiğiniz bilgileri aşağıda sunmaktan memnuniyet duyarım.",
-        "Okulumuz hakkinda talep ettiginiz bilgileri asagida sunmaktan memnuniyet duyarim.",
+        "Okulumuz hakkında talep ettiğiniz bilgileri aşağıda sunmaktan memnuniyet duyarım.",
     ]
     for sentence in followups:
         if cleaned.startswith(sentence):
@@ -269,7 +269,7 @@ async def start_session(req: SessionStart):
     session["last_seen"] = time.time()
     user_name = session.get("user_name", "")
     if req.greeting_type == "presence":
-        answer = "Merhaba, okulumuza hos geldiniz. Bilgi almak icin Bilgi Al butonuna tiklayabilirsiniz."
+        answer = "Merhaba, okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz."
     elif user_name:
         answer = f"Tekrar merhaba {user_name}. Okulumuz hakkında ne öğrenmek istersin?"
     else:
@@ -300,17 +300,17 @@ async def ask_question(question: Question):
     if detected_name:
         session["user_name"] = detected_name
         session["asked_name"] = True
-        answer = f"Memnun oldum {detected_name}. Okulumuz hakkinda ne ogrenmek istersin?"
+        answer = f"Memnun oldum {detected_name}. Okulumuz hakkında ne öğrenmek istersin?"
         return make_audio_response(answer, question.session_id, detected_name)
 
     if not session.get("user_name"):
         session["asked_name"] = True
-        answer = "Merhaba, ben Data Koleji tanitim robotuyum. Sorunuzu yanitlamadan once size nasil hitap edebilirim?"
+        answer = "Merhaba, ben Data Koleji tanıtım robotuyum. Sorunuzu yanıtlamadan önce size nasıl hitap edebilirim?"
         return make_audio_response(answer, question.session_id)
 
     user_name = session.get("user_name", "")
     if is_positive_feedback(question.question):
-        answer = f"Rica ederim {user_name}. Yardimci olabildiysem ne mutlu bana."
+        answer = f"Rica ederim {user_name}. Yardımcı olabildiysem ne mutlu bana."
         return make_audio_response(answer, question.session_id, user_name, face_state="complimented")
 
     rag_engine = ensure_rag_engine()
@@ -685,25 +685,39 @@ async def voice_ask(audio: UploadFile = File(...)):
     """Sesli komut: ses -> metin -> cevap"""
     audio_dir = Path("audio_output")
     audio_dir.mkdir(exist_ok=True)
-    temp_path = audio_dir / f"voice_input_{uuid.uuid4().hex[:8]}.webm"
+    ext = Path(audio.filename or "").suffix.lower()
+    if ext not in (".webm", ".ogg", ".mp3", ".wav", ".mp4", ".m4a"):
+        content_type = (audio.content_type or "").lower()
+        if "ogg" in content_type:
+            ext = ".ogg"
+        elif "mp4" in content_type or "m4a" in content_type:
+            ext = ".mp4"
+        elif "mpeg" in content_type or "mp3" in content_type:
+            ext = ".mp3"
+        else:
+            ext = ".webm"
+    temp_path = audio_dir / f"voice_input_{uuid.uuid4().hex[:8]}{ext}"
     with open(temp_path, "wb") as f:
         f.write(await audio.read())
 
     # STT ile metne çevir
     transcript = ""
+    errors = []
     if stt_service:
         try:
             transcript = stt_service.transcribe(str(temp_path), language_code="tr-TR")
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"tr-TR: {e}")
     if not transcript and stt_service:
         try:
             transcript = stt_service.transcribe(str(temp_path), language_code="en-US")
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"en-US: {e}")
 
     if not transcript:
-        return {"transcript": "", "error": "Ses anlaşılamadı. Lütfen tekrar deneyin."}
+        detail = " ".join(errors)
+        print(f"STT failed for {temp_path.name}: {detail}")
+        return {"transcript": "", "error": "Ses anlaşılamadı. Lütfen mikrofona biraz daha yakın ve net konuşarak tekrar deneyin.", "debug": detail}
 
     return {"transcript": transcript}
 

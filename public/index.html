@@ -915,6 +915,22 @@
                 .trim();
         }
 
+        function getSupportedAudioMimeType() {
+            const candidates = [
+                'audio/webm;codecs=opus',
+                'audio/webm',
+                'audio/ogg;codecs=opus',
+                'audio/ogg'
+            ];
+            return candidates.find(type => window.MediaRecorder && MediaRecorder.isTypeSupported(type)) || '';
+        }
+
+        function audioFileNameForMime(mimeType) {
+            if (mimeType.includes('ogg')) return 'voice.ogg';
+            if (mimeType.includes('mp4')) return 'voice.mp4';
+            return 'voice.webm';
+        }
+
         function clearActiveOutputs() {
             const ids = ['answer', 'pdfViewer', 'simSection', 'pronSection', 'simplifySection', 'quizSection', 'vocabSection', 'dialogueSection', 'reportSection', 'faceBar'];
             ids.forEach(id => {
@@ -1084,16 +1100,23 @@
                 return;
             }
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
                 voiceChunks = [];
-                voiceRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                const mimeType = getSupportedAudioMimeType();
+                voiceRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
                 voiceRecorder.ondataavailable = e => voiceChunks.push(e.data);
                 voiceRecorder.onstop = async () => {
                     stream.getTracks().forEach(t => t.stop());
                     document.getElementById('voiceBtn').textContent = '🎙️';
                     document.getElementById('voiceStatus').style.display = 'none';
                     switchVideo('default');
-                    const blob = new Blob(voiceChunks, { type: 'audio/webm' });
+                    const blob = new Blob(voiceChunks, { type: voiceRecorder.mimeType || mimeType || 'audio/webm' });
                     await sendVoiceCommand(blob);
                 };
                 voiceRecorder.start();
@@ -1115,7 +1138,7 @@
             answerDiv.innerHTML = SKL.minimal;
 
             const fd = new FormData();
-            fd.append('audio', blob, 'voice.webm');
+            fd.append('audio', blob, audioFileNameForMime(blob.type || 'audio/webm'));
 
             try {
                 const r = await fetch(`${API}/voice-ask`, { method: 'POST', body: fd });
