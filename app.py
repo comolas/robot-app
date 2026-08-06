@@ -172,6 +172,11 @@ class SessionStart(BaseModel):
     session_id: str = "default"
     greeting_type: str = ""
 
+class PresenceSignal(BaseModel):
+    session_id: str = "default"
+    source: str = "raspberry-pi"
+    detection_type: str = "person"
+
 # WebScraper (galeri cache icin global)
 _web_scraper_instance = None
 def get_web_scraper():
@@ -201,6 +206,7 @@ class EvaluateRequest(BaseModel):
     student_name: str
 
 sessions: dict[str, dict] = {}
+presence_events: dict[str, dict] = {}
 
 def get_session(session_id: str) -> dict:
     session_id = session_id or "default"
@@ -275,6 +281,33 @@ async def start_session(req: SessionStart):
     else:
         answer = "Merhaba, ben Data Koleji tanıtım robotuyum. Size nasıl hitap edebilirim?"
     return make_audio_response(answer, req.session_id, user_name)
+
+@app.post("/robot/presence", response_model=Answer)
+async def robot_presence(req: PresenceSignal):
+    session = get_session(req.session_id)
+    session["asked_name"] = True
+    session["last_seen"] = time.time()
+    user_name = session.get("user_name", "")
+    answer = "Merhaba, okulumuza hos geldiniz. Bilgi almak icin Bilgi Al butonuna tiklayabilirsiniz."
+    response = make_audio_response(answer, req.session_id, user_name, face_state="happy")
+    presence_events["latest"] = {
+        "id": uuid.uuid4().hex,
+        "created_at": time.time(),
+        "session_id": req.session_id,
+        "source": req.source,
+        "detection_type": req.detection_type,
+        "answer": response.answer,
+        "audio_path": response.audio_path,
+        "face_state": response.face_state,
+    }
+    return response
+
+@app.get("/robot/presence/latest")
+async def latest_robot_presence(since: str = ""):
+    event = presence_events.get("latest")
+    if not event or event.get("id") == since:
+        return {"event": None}
+    return {"event": event}
 
 @app.post("/robot/touch/head", response_model=Answer)
 async def head_touch(req: SessionStart):

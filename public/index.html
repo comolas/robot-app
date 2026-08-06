@@ -700,6 +700,7 @@
         const PRESENCE_FRAMES_REQUIRED = 1;
         const PERSON_SCORE_THRESHOLD = 0.55;
         const PERSON_DETECTION_INTERVAL_MS = 700;
+        const USE_BROWSER_CAMERA_PRESENCE = false;
         let idleTimer = null;
         let appIsOpen = false;
         let presenceStream = null;
@@ -713,6 +714,7 @@
         let personModelFailed = false;
         let personDetectionBusy = false;
         let lastPersonDetectionAt = 0;
+        let lastPiPresenceEventId = localStorage.getItem('robot_last_pi_presence_event') || '';
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
 
@@ -867,6 +869,33 @@
             } catch (e) {}
         }
 
+        function handlePresenceEvent(event) {
+            if (!event || event.id === lastPiPresenceEventId || appIsOpen) return;
+            lastPiPresenceEventId = event.id;
+            localStorage.setItem('robot_last_pi_presence_event', lastPiPresenceEventId);
+            presenceLastGreetingAt = Date.now();
+            setIdleFace(event.face_state || 'happy', 5000);
+            if (event.session_id) {
+                SESSION_ID = event.session_id;
+                localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
+            }
+            if (event.audio_path) {
+                new Audio(`${API}${event.audio_path}`).play().catch(() => {
+                    speakLocalGreeting(event.answer || '');
+                });
+            } else {
+                speakLocalGreeting(event.answer || '');
+            }
+        }
+
+        async function pollPiPresence() {
+            try {
+                const response = await fetch(`${API}/robot/presence/latest?since=${encodeURIComponent(lastPiPresenceEventId)}`);
+                const data = await response.json();
+                handlePresenceEvent(data.event);
+            } catch (e) {}
+        }
+
         function speakLocalGreeting(text) {
             if (!window.speechSynthesis) return;
             const utterance = new SpeechSynthesisUtterance(text);
@@ -995,7 +1024,9 @@
                 const btn = document.getElementById('themeToggle');
                 if (btn) btn.textContent = 'Tema';
                 showIdleScreen();
-                startPresenceCamera();
+                if (USE_BROWSER_CAMERA_PRESENCE) startPresenceCamera();
+                pollPiPresence();
+                setInterval(pollPiPresence, 1500);
                 requestFullscreenMode();
                 ['click', 'keydown', 'touchstart', 'mousemove'].forEach(type => {
                     document.addEventListener(type, resetIdleTimer, { passive: true });

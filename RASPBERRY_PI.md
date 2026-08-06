@@ -1,83 +1,98 @@
 # Raspberry Pi 5 Kamera Entegrasyonu
 
-Bu ilk surumde Raspberry Pi 5 kamera ile kisi algilaninca backend'e oturum baslatma istegi gonderilir.
+Bu kurulumda kişi algılama Raspberry Pi 5 üzerinde yapılır. Tablet veya bilgisayar sadece web arayüzünü gösterir. Böylece eski Chrome sürümleri kamera/model uyumsuzluğu yaşasa bile robot karşılama tepkisini güvenilir şekilde verebilir.
 
-## Kurulum
+## Çalışma Mantığı
 
-Raspberry Pi uzerinde:
+1. Raspberry Pi 5 kamera görüntüsünü okur.
+2. Önce OpenCV HOG insan algılama çalışır.
+3. İnsan algılama yeterince güvenli sonuç vermezse hareket algılama yedek olarak devreye girer.
+4. Algılama olunca Pi backend'e şu isteği gönderir:
 
-```bash
-pip install opencv-python requests
+```text
+POST /robot/presence
 ```
 
-## Calistirma
+5. Web arayüzü `/robot/presence/latest` endpoint'ini 1.5 saniyede bir kontrol eder.
+6. Yeni algılama olayı gelirse çizgi yüz gülümser ve karşılama sesi çalınır.
+
+## Raspberry Pi Kurulumu
+
+```bash
+sudo apt update
+sudo apt install -y python3-opencv
+pip install requests
+```
+
+Kamera modülünü test etmek için:
+
+```bash
+libcamera-hello
+```
+
+OpenCV kamerayı görmüyorsa kamera için V4L2 uyumluluğunu kontrol etmek gerekebilir.
+
+## Çalıştırma
 
 ```bash
 python raspberry_pi_presence.py
 ```
 
-Script kamera goruntusunde kisi algiladiginda su endpoint'i cagirir:
+Varsayılan API adresi:
 
 ```text
-POST /session/start
+https://robot-app-1047763414877.europe-west1.run.app
 ```
 
-Backend su cevabi uretir:
+Farklı bir backend kullanmak için:
 
-```text
-Merhaba, ben Data Koleji tanitim robotuyum. Size nasil hitap edebilirim?
+```bash
+ROBOT_API_BASE_URL=https://SENIN-CLOUD-RUN-ADRESIN python raspberry_pi_presence.py
 ```
 
-Sonraki soru isteklerinde ayni `session_id` kullanilirsa backend kullanicinin ismini konusma boyunca hatirlar.
+## Ayarlar
 
-## Soru gonderme ornegi
+Ortam değişkenleriyle hassasiyet değiştirilebilir:
 
-```json
-{
-  "session_id": "pi5-ornek-oturum",
-  "question": "Benim adim Arif"
-}
+```bash
+ROBOT_DETECTION_COOLDOWN=30
+ROBOT_PERSON_CONFIRM_FRAMES=2
+ROBOT_MOTION_CONFIRM_FRAMES=6
+ROBOT_MOTION_AREA_THRESHOLD=9000
+ROBOT_CAMERA_INDEX=0
+ROBOT_SHOW_PREVIEW=1
+python raspberry_pi_presence.py
 ```
 
-Sonraki soru:
+Öneriler:
 
-```json
-{
-  "session_id": "pi5-ornek-oturum",
-  "question": "Okul hakkinda bilgi verir misin?"
-}
-```
+- Çok sık tetikliyorsa `ROBOT_MOTION_AREA_THRESHOLD` değerini yükseltin.
+- Geç tetikliyorsa `ROBOT_MOTION_CONFIRM_FRAMES` değerini düşürün.
+- Test sırasında görüntüyü görmek için `ROBOT_SHOW_PREVIEW=1` kullanın.
+- Üretimde preview kapalı kalsın.
 
-## Kafa sevme / dokunma algilama
+## Kafa Sevme / Dokunma Algılama
 
-Robotun kafasina kapasitif dokunma sensoru eklenirse Raspberry Pi backend'e su endpoint ile haber verir:
+Robotun kafasına kapasitif dokunma sensörü eklenirse Raspberry Pi backend'e şu endpoint ile haber verir:
 
 ```text
 POST /robot/touch/head
 ```
 
-Backend su anlamda bir cevap dondurur:
-
-```text
-Beni mutlu ettiniz. Tesekkur ederim.
-```
-
-Kullanici adi biliniyorsa cevap isme gore kisilesir.
-
-Ornek GPIO script'i:
+Kurulum:
 
 ```bash
 pip install gpiozero requests
 python raspberry_pi_head_touch.py
 ```
 
-Varsayilan pin:
+Varsayılan pin:
 
 ```text
 GPIO17
 ```
 
-Kapasitif dokunma sensoru icin tipik baglanti:
+Tipik bağlantı:
 
 ```text
 VCC -> 3.3V
@@ -85,4 +100,4 @@ GND -> GND
 OUT -> GPIO17
 ```
 
-Endpoint cevabinda `face_state` alani `complimented` olarak gelir. Pi uzerindeki ekran bu degeri gorunce iltifat/kizarma yuzunu 5 saniye gosterebilir.
+Endpoint cevabında `face_state` alanı `complimented` olarak gelir.
