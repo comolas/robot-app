@@ -221,8 +221,12 @@
         .line-face.is-petted .line-eye { transform: rotate(-10deg); }
         .line-face.is-petted .line-smile { bottom: 25%; height: 31%; }
         .line-face.is-speaking .line-smile {
+            left: 39%; right: 39%; bottom: 26%; height: 15%;
+            border: 6px solid var(--text);
+            border-radius: 999px;
+            background: var(--text);
             animation: mouthTalk 0.34s ease-in-out infinite;
-            transform-origin: center bottom;
+            transform-origin: center center;
         }
         .idle-title {
             margin: 0; font-size: clamp(28px, 5vw, 48px); font-weight: 700;
@@ -262,19 +266,22 @@
         }
         @keyframes mouthTalk {
             0%, 100% {
-                left: 30%; right: 30%; bottom: 27%; height: 12%;
-                border-bottom-width: 7px;
-                transform: scaleY(0.7);
+                left: 40%; right: 40%; bottom: 28%; height: 5%;
+                border-width: 5px;
+                background: var(--text);
+                transform: scaleY(0.45);
             }
-            35% {
-                left: 28%; right: 28%; bottom: 24%; height: 27%;
-                border-bottom-width: 8px;
-                transform: scaleY(1.2);
+            32% {
+                left: 37%; right: 37%; bottom: 24%; height: 19%;
+                border-width: 6px;
+                background: transparent;
+                transform: scaleY(1);
             }
-            70% {
-                left: 35%; right: 35%; bottom: 28%; height: 9%;
-                border-bottom-width: 6px;
-                transform: scaleY(0.55);
+            62% {
+                left: 42%; right: 42%; bottom: 27%; height: 12%;
+                border-width: 6px;
+                background: transparent;
+                transform: scaleY(0.85);
             }
         }
         @keyframes petWiggle {
