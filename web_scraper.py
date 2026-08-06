@@ -6,6 +6,12 @@ from bs4 import BeautifulSoup
 
 
 class WebScraper:
+    STAFF_PATHS = [
+        "/ovacik-kampusu-egitim-kadrosu/",
+        "/mamak-kampusu-egitim-kadrosu/",
+        "/baglica-kampusu-egitim-kadrosu/",
+    ]
+
     def __init__(self, base_url: str, max_pages: int = 120):
         self.base_url = base_url.rstrip("/")
         self.domain = urlparse(base_url).netloc
@@ -51,10 +57,12 @@ class WebScraper:
 
     def _crawl(self, start_url: str) -> dict:
         """Sitedeki sayfaları tara ve içeriklerini topla."""
+        staff_links = [urljoin(self.base_url + "/", path).rstrip("/") for path in self.STAFF_PATHS]
         sitemap_links = self._load_sitemap_links()
         priority_sitemap_links = [link for link in sitemap_links if self._is_priority_link(link)]
         other_sitemap_links = [link for link in sitemap_links if not self._is_priority_link(link)]
-        to_visit = [start_url] + priority_sitemap_links + other_sitemap_links
+        to_visit = [start_url] + staff_links + priority_sitemap_links + other_sitemap_links
+        to_visit = list(dict.fromkeys(to_visit))
         queued = set(to_visit)
         pages = {}
 
