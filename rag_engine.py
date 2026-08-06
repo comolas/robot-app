@@ -32,7 +32,7 @@ class RAGEngine:
             content = f.read()
         self._index_text(content)
 
-    def load_from_url(self, url: str, max_pages: int = 30):
+    def load_from_url(self, url: str, max_pages: int = 120):
         """Web sitesini tarayıp vektör veritabanına kaydet"""
         from web_scraper import WebScraper
         scraper = WebScraper(url, max_pages=max_pages)
@@ -76,15 +76,15 @@ class RAGEngine:
 
 FORMATLAMA KURALLARI (MUTLAKA UYULMASI GEREKEN):
 1. Cevaplarını MUTLAKA Markdown formatında döndür
-1a. Kendini sadece ilk tanisma cevabinda tanit; takip eden cevaplarda dogrudan sorunun cevabina gec
-2. Giris cumlesinden sonra en fazla tek bos satir kullan
+1a. Kendini sadece ilk tanışma cevabında tanıt; takip eden cevaplarda doğrudan sorunun cevabına geç
+2. Giriş cümlesinden sonra en fazla tek boş satır kullan
 3. Başlıkları numaralı ve BÜYÜK HARFLE yaz (örnek: 1. AKADEMİK BAŞARILAR)
-4. Basliktan hemen sonra metne gec; baslik ile paragraf arasinda bos satir birakma
-5. Paragraflar arasinda en fazla tek bos satir kullan; art arda bos satir kullanma
+4. Başlıktan hemen sonra metne geç; başlık ile paragraf arasında boş satır bırakma
+5. Paragraflar arasında en fazla tek boş satır kullan; art arda boş satır kullanma
 6. Madde işareti kullanma, akıcı paragraflar yaz
 
 ÖRNEK FORMAT:
-Ilk bilgi cevabinda kisa bir tanitim cumlesi kullanabilirsin. Takip eden cevaplarda bu cumleyi tekrar etme.
+İlk bilgi cevabında kısa bir tanıtım cümlesi kullanabilirsin. Takip eden cevaplarda bu cümleyi tekrar etme.
 
 Eğer sorulan bilgi mevcut değilse: "Bu konuda detaylı bilgiye sahip değilim. Daha fazla bilgi için lütfen okul yönetimi ile iletişime geçiniz."
 

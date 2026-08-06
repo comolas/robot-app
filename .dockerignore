@@ -4,6 +4,7 @@
 __pycache__/
 *.pyc
 audio_output/
+vectordb/
 credentials.json
 firebase.json
 .firebaserc
