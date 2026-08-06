@@ -220,6 +220,10 @@
         .line-face.is-petted { animation: petWiggle 0.8s ease-in-out 2, faceBreath 3.4s ease-in-out infinite; }
         .line-face.is-petted .line-eye { transform: rotate(-10deg); }
         .line-face.is-petted .line-smile { bottom: 25%; height: 31%; }
+        .line-face.is-speaking .line-smile {
+            animation: mouthTalk 0.34s ease-in-out infinite;
+            transform-origin: center bottom;
+        }
         .idle-title {
             margin: 0; font-size: clamp(28px, 5vw, 48px); font-weight: 700;
             text-align: center;
@@ -255,6 +259,23 @@
         @keyframes faceBreath {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-5px) scale(1.015); }
+        }
+        @keyframes mouthTalk {
+            0%, 100% {
+                left: 30%; right: 30%; bottom: 27%; height: 12%;
+                border-bottom-width: 7px;
+                transform: scaleY(0.7);
+            }
+            35% {
+                left: 28%; right: 28%; bottom: 24%; height: 27%;
+                border-bottom-width: 8px;
+                transform: scaleY(1.2);
+            }
+            70% {
+                left: 35%; right: 35%; bottom: 28%; height: 9%;
+                border-bottom-width: 6px;
+                transform: scaleY(0.55);
+            }
         }
         @keyframes petWiggle {
             0%, 100% { transform: rotate(0deg) scale(1); }
@@ -744,6 +765,43 @@
         function setPresenceStatus(message) {
         }
 
+        function setSpeakingFace(isSpeaking) {
+            const face = document.getElementById('idleFace');
+            if (!face) return;
+            face.classList.toggle('is-speaking', Boolean(isSpeaking));
+        }
+
+        function playRobotAudio(url, fallbackText = '') {
+            if (!url) {
+                speakLocalGreeting(fallbackText);
+                return null;
+            }
+            const audio = new Audio(url);
+            audio.addEventListener('play', () => {
+                setSpeakingFace(true);
+                switchVideo('speaking');
+            });
+            audio.addEventListener('ended', () => {
+                setSpeakingFace(false);
+                switchVideo('default');
+            });
+            audio.addEventListener('pause', () => {
+                setSpeakingFace(false);
+                switchVideo('default');
+            });
+            audio.addEventListener('error', () => {
+                setSpeakingFace(false);
+                switchVideo('default');
+                speakLocalGreeting(fallbackText);
+            });
+            audio.play().catch(() => {
+                setSpeakingFace(false);
+                switchVideo('default');
+                speakLocalGreeting(fallbackText);
+            });
+            return audio;
+        }
+
         async function loadPersonModel() {
             if (personModelReady || personModelFailed || personModel) return;
             if (!window.cocoSsd) {
@@ -880,9 +938,7 @@
                 localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
             }
             if (event.audio_path) {
-                new Audio(`${API}${event.audio_path}`).play().catch(() => {
-                    speakLocalGreeting(event.answer || '');
-                });
+                playRobotAudio(`${API}${event.audio_path}`, event.answer || '');
             } else {
                 speakLocalGreeting(event.answer || '');
             }
@@ -900,6 +956,18 @@
             if (!window.speechSynthesis) return;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'tr-TR';
+            utterance.onstart = () => {
+                setSpeakingFace(true);
+                switchVideo('speaking');
+            };
+            utterance.onend = () => {
+                setSpeakingFace(false);
+                switchVideo('default');
+            };
+            utterance.onerror = () => {
+                setSpeakingFace(false);
+                switchVideo('default');
+            };
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         }
@@ -1000,7 +1068,7 @@
                     body: JSON.stringify({ session_id: SESSION_ID })
                 });
                 const data = await response.json();
-                if (data.audio_path) new Audio(`${API}${data.audio_path}`).play().catch(() => {});
+                if (data.audio_path) playRobotAudio(`${API}${data.audio_path}`, data.answer || '');
             } catch (e) {}
             const q = document.getElementById('question');
             if (q) q.focus();
@@ -1301,9 +1369,8 @@
 
                 if (data.audio_path) {
                     setMood('speaking', 'KonuÅŸuyor...');
-                    const audio = new Audio(`${API}${data.audio_path}`);
+                    const audio = playRobotAudio(`${API}${data.audio_path}`, data.answer || '');
                     audio.onended = () => setMood('happy', '');
-                    audio.play();
                 } else if (!isPdf) {
                     setMood('happy', '');
                 }
@@ -1925,7 +1992,7 @@
                 dlgState = { scenario: data.scenario_id, level: data.level, history: data.history };
                 document.getElementById('dlgChatBox').innerHTML = '';
                 addChatMsg('ai', data.ai_message, data.ai_audio);
-                new Audio(`${API}${data.ai_audio}`).play();
+                playRobotAudio(`${API}${data.ai_audio}`, data.ai_message || '');
             } catch(e) {
                 document.getElementById('dlgChatBox').innerHTML = '<p style="color:red;">BaÅŸlatÄ±lamadÄ±.</p>';
             }
@@ -1974,7 +2041,7 @@
                 if (msgs.length) msgs[msgs.length - 1].innerHTML = `<div class="chat-role">&#128100; Sen</div>${data.student_text}`;
 
                 addChatMsg('ai', data.ai_message, data.ai_audio);
-                new Audio(`${API}${data.ai_audio}`).play();
+                playRobotAudio(`${API}${data.ai_audio}`, data.ai_message || '');
                 dlgBlob = null;
 
                 if (data.ended && data.evaluation) {
