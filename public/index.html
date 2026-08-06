@@ -264,8 +264,8 @@
         details { margin: 10px 0; border: 1px solid var(--border-soft); border-radius: 6px; }
         details summary { cursor: pointer; font-weight: 500; padding: 10px 14px; list-style: none; color: var(--text); }
         details summary::-webkit-details-marker { display: none; }
-        details summary::before { content: "â–¶ "; font-size: 12px; }
-        details[open] summary::before { content: "â–¼ "; font-size: 12px; }
+        details summary::before { content: "\25B6 "; font-size: 12px; }
+        details[open] summary::before { content: "\25BC "; font-size: 12px; }
         details summary:hover { color: #007bff; }
         .answer-text { padding: 10px 16px; background: var(--answer-text-bg); border-top: 1px solid var(--border-soft); border-radius: 0 0 6px 6px; color: var(--text); }
         .q-audio-btn { width: auto; display: inline; padding: 2px 8px; margin: 0 0 0 6px; font-size: 14px; vertical-align: middle; }
@@ -489,32 +489,32 @@
         <p style="font-size:26px; font-weight:700; margin:0 0 14px 0; letter-spacing:2px; text-transform:uppercase; color:var(--text);">Hoş Geldiniz!</p>
         <div class="quick-cards">
             <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okul hakkÄ±nda bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">ğŸ«</span>
+                <span class="quick-card-icon">&#127979;</span>
                 <div class="quick-card-label">Okul HakkÄ±nda</div>
                 <div class="quick-card-desc">Genel bilgi ve tarihÃ§e</div>
             </div>
             <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Uçak Bakım Bölümü hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">âœˆï¸</span>
+                <span class="quick-card-icon">&#9992;&#65039;</span>
                 <div class="quick-card-label">Uçak Bakım</div>
                 <div class="quick-card-desc">Bölüm ve kariyer fırsatları</div>
             </div>
             <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Elektrik Bölümü hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">âš¡</span>
+                <span class="quick-card-icon">&#9889;</span>
                 <div class="quick-card-label">Elektrik Bölümü</div>
                 <div class="quick-card-desc">Müfredat ve olanaklar</div>
             </div>
             <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Makine Bölümü hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">âš™ï¸</span>
+                <span class="quick-card-icon">&#9881;&#65039;</span>
                 <div class="quick-card-label">Makine Bölümü</div>
                 <div class="quick-card-desc">Müfredat ve olanaklar</div>
             </div>
             <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okul etkinlikleri hakkında bilgi ver'; askQuestion();">
-                <span class="quick-card-icon">ğŸ‰</span>
+                <span class="quick-card-icon">&#127881;</span>
                 <div class="quick-card-label">Etkinlikler</div>
                 <div class="quick-card-desc">Kulüpler ve sosyal faaliyetler</div>
             </div>
             <div class="quick-card" onclick="switchVideo('speaking'); document.getElementById('question').value='Okula ait görselleri göster'; askQuestion();">
-                <span class="quick-card-icon">ğŸ–¼ï¸</span>
+                <span class="quick-card-icon">&#128444;&#65039;</span>
                 <div class="quick-card-label">Okul Galerisi</div>
                 <div class="quick-card-desc">Fotoğraflar ve görseller</div>
             </div>
@@ -545,13 +545,13 @@
         <button class="btn" style="flex:1; background:#1e1b4b;" onclick="askQuestion()">G&ouml;nder</button>
         <button id="voiceBtn" class="btn btn-danger" style="flex:0 0 auto; width:auto; padding:14px 24px;" onclick="toggleVoiceInput()">Mikrofon</button>
     </div>
-    <p id="voiceStatus" style="display:none;" class="recording-indicator">âº Dinleniyor...</p>
+    <p id="voiceStatus" style="display:none;" class="recording-indicator">&#9209; Dinleniyor...</p>
     <div id="answer" class="result-box" style="display:none;"></div>
 
     <!-- DENEY SÄ°MÃœLASYONU -->
     <div id="simSection" style="display:none;">
         <hr>
-        <h2>ğŸ§ª Deney Simülasyonu</h2>
+        <h2>&#129514; Deney Simülasyonu</h2>
         <button class="btn btn-success" onclick="generateSimulation()">Sim&uuml;lasyon Olu&#351;tur</button>
         <canvas id="labCanvas" width="760" height="400" style="display:none; background:linear-gradient(180deg,#e8eaf6 0%,#c5cae9 100%); border-radius:8px; border:1px solid #9fa8da; margin-top:12px;"></canvas>
         <div id="simStepInfo" style="display:none; padding:12px; margin-top:8px; background:var(--bg-card); border-radius:8px; border:1px solid var(--border-soft); color:var(--text);"></div>
@@ -561,7 +561,7 @@
     <!-- SEVÄ°YE UYARLAMA -->
     <div id="simplifySection" style="display:none;">
         <hr>
-        <h2>ğŸ“š Seviye Uyarlama</h2>
+        <h2>&#128218; Seviye Uyarlama</h2>
         <div class="simplify-section">
             <p><strong>Metni farklı bir dil seviyesine uyarlayın:</strong></p>
             <div class="level-row">
@@ -582,7 +582,7 @@
     <!-- SINAV / QUIZ OLUÅTURUCU -->
     <div id="quizSection" style="display:none;">
         <hr>
-        <h2>ğŸ“ Sınav / Quiz Oluşturucu</h2>
+        <h2>&#128221; Sınav / Quiz Oluşturucu</h2>
         <div class="quiz-section">
             <p><strong>Metinden otomatik sınav oluşturun:</strong></p>
             <div class="level-row">
@@ -606,7 +606,7 @@
     <!-- KELİME LİSTESİ -->
     <div id="vocabSection" style="display:none;">
         <hr>
-        <h2>ğŸ“– Kelime Listesi</h2>
+        <h2>&#128214; Kelime Listesi</h2>
         <div class="vocab-section">
             <p><strong>Metindeki önemli kelimeleri çıkarın:</strong></p>
             <div class="level-row">
@@ -627,13 +627,13 @@
     <!-- TELAFFUZ TESTİ -->
     <div id="pronSection" style="display:none;">
         <hr>
-        <h2>ğŸ¤ Telaffuz Testi</h2>
+        <h2>&#127908; Telaffuz Testi</h2>
         <div class="pron-section">
             <p><strong>Aşağıdaki metni sesli okuyun:</strong></p>
             <div id="pronReferenceText" style="padding:12px; background:var(--pron-ref-bg); border-radius:6px; border:1px solid var(--border-soft); margin-bottom:12px; color:var(--text);"></div>
             <input type="text" id="studentName" class="input-name" placeholder="Öğrenci adı (opsiyonel)" value="" />
             <button id="btnRecord" class="btn btn-danger" onclick="toggleRecording()">Kayda Ba&#351;la</button>
-            <p id="recordingStatus" style="display:none;" class="recording-indicator">âº Kayıt yapılıyor...</p>
+            <p id="recordingStatus" style="display:none;" class="recording-indicator">&#9209; Kayıt yapılıyor...</p>
             <button id="btnSendPron" class="btn btn-success" style="display:none;" onclick="sendPronunciation()">De&#287;erlendir</button>
         </div>
         <div id="pronResult" class="result-box" style="display:none;"></div>
@@ -642,7 +642,7 @@
     <!-- KONUŞMA PRATİĞİ -->
     <div id="dialogueSection" style="display:none;">
     <hr>
-    <h2>ğŸ’¬ Konuşma Pratiği</h2>
+    <h2>&#128172; Konuşma Pratiği</h2>
     <div class="dialogue-section">
         <p><strong>Bir senaryo seçin ve İngilizce konuşma pratiği yapın:</strong></p>
         <div class="level-row">
@@ -659,7 +659,7 @@
     <div id="dlgChat" style="display:none;">
         <div id="dlgChatBox" class="chat-box"></div>
         <button id="dlgRecordBtn" class="btn btn-danger" onclick="dlgToggleRecord()">Konu&#351;</button>
-        <p id="dlgRecStatus" style="display:none;" class="recording-indicator">âº Kayıt yapılıyor...</p>
+        <p id="dlgRecStatus" style="display:none;" class="recording-indicator">&#9209; Kayıt yapılıyor...</p>
         <button id="dlgSendBtn" class="btn btn-success" style="display:none;" onclick="dlgSend()">G&ouml;nder</button>
         <div id="dlgEvaluation" style="display:none;"></div>
     </div>
@@ -668,7 +668,7 @@
     <!-- Ã–ÄRENCÄ° PERFORMANS RAPORU -->
     <div id="reportSection" style="display:none;">
     <hr>
-    <h2>ğŸ“Š Ã–ÄŸrenci Performans Raporu</h2>
+    <h2>&#128202; Öğrenci Performans Raporu</h2>
     <div class="report-section">
         <div class="report-row">
             <select id="reportStudent"><option value="">Öğrenci seçin...</option></select>
@@ -1317,7 +1317,7 @@
 
                 // Sorular varsa gÃ¶ster
                 if (data.questions && data.questions.length > 0) {
-                    let qhtml = '<strong>ğŸ“ Sorular:</strong><br>';
+                    let qhtml = '<strong>&#128221; Sorular:</strong><br>';
                     data.questions.forEach((q, i) => {
                         const audioUrl = data.question_audio_paths[i] ? `${API}${data.question_audio_paths[i]}` : '';
                         const ans = data.answers && data.answers[i] ? data.answers[i] : '';
@@ -1365,7 +1365,7 @@
                 }
 
                 if (data.vocabulary_notes && data.vocabulary_notes.length > 0) {
-                    html += `<p style="margin-top:16px;"><strong>ğŸ“– Kelime NotlarÄ±:</strong></p>`;
+                    html += `<p style="margin-top:16px;"><strong>&#128214; Kelime NotlarÄ±:</strong></p>`;
                     data.vocabulary_notes.forEach(v => {
                         html += `<span class="vocab-chip"><strong>${v.word}</strong>: ${v.meaning}</span> `;
                     });
@@ -1525,14 +1525,14 @@
 
             // Malzemeler
             if (d.materials && d.materials.length) {
-                html += `<h2 style="margin-top:12px;">ğŸ§° Malzemeler</h2><div class="sim-materials">`;
-                d.materials.forEach(m => html += `<span class="sim-mat-chip">${m.icon||'ğŸ“¦'} ${m.name}${m.quantity?' ('+m.quantity+')':''}</span>`);
+                html += `<h2 style="margin-top:12px;">&#129520; Malzemeler</h2><div class="sim-materials">`;
+                d.materials.forEach(m => html += `<span class="sim-mat-chip">${m.icon||'&#128230;'} ${m.name}${m.quantity?' ('+m.quantity+')':''}</span>`);
                 html += `</div>`;
             }
             // GÃ¼venlik
             if (d.safety && d.safety.length) {
                 html += `<div class="sim-safety">`;
-                d.safety.forEach(s => html += `<p>${s.icon||'âš ï¸'} <strong>${s.warning}</strong></p>`);
+                d.safety.forEach(s => html += `<p>${s.icon||'&#9888;&#65039;'} <strong>${s.warning}</strong></p>`);
                 html += `</div>`;
             }
 
@@ -1549,16 +1549,16 @@
             // SonuÃ§
             if (simCurrentStep >= totalSteps - 1 && d.result) {
                 const res = d.result;
-                html += `<div class="sim-result"><h2>ğŸ¯ SonuÃ§</h2>`;
+                html += `<div class="sim-result"><h2>&#127919; SonuÃ§</h2>`;
                 if (res.what_happened) html += `<p><strong>Ne oldu?</strong> ${res.what_happened}</p>`;
                 if (res.why) html += `<p><strong>Neden oldu?</strong> ${res.why}</p>`;
                 if (res.formula) html += `<p><strong>FormÃ¼l:</strong> <code>${res.formula}</code></p>`;
-                if (res.real_life) html += `<p><strong>ğŸŒ GÃ¼nlÃ¼k Hayat:</strong> ${res.real_life}</p>`;
+                if (res.real_life) html += `<p><strong>&#127757; GÃ¼nlÃ¼k Hayat:</strong> ${res.real_life}</p>`;
                 if (d.result_audio) html += `<button class="btn btn-primary btn-inline" style="margin-top:8px;" onclick="new Audio('${API}${d.result_audio}').play()">Sonucu Dinle</button>`;
                 html += `</div>`;
                 const cr = d.chemical_reaction;
                 if (cr && cr.has_reaction && cr.equation) {
-                    html += `<div class="sim-reaction"><strong>âš—ï¸ ${cr.type||'Kimyasal Reaksiyon'}</strong><br><br><span style="font-size:20px;">${cr.equation}</span></div>`;
+                    html += `<div class="sim-reaction"><strong>&#9879;&#65039; ${cr.type||'Kimyasal Reaksiyon'}</strong><br><br><span style="font-size:20px;">${cr.equation}</span></div>`;
                 }
                 html += `<button class="btn btn-orange btn-inline" style="margin-top:12px;" onclick="downloadSimPDF()">Deney Raporu &#304;ndir</button>`;
             }
@@ -1578,7 +1578,7 @@
                     const info = document.getElementById('simStepInfo');
                     info.style.display = 'block';
                     let sh = `<strong>${stepData.title}</strong><p>${stepData.description}</p>`;
-                    if (stepData.observation) sh += `<p style="color:#555;font-style:italic;">ğŸ‘ï¸ ${stepData.observation}</p>`;
+                    if (stepData.observation) sh += `<p style="color:#555;font-style:italic;">&#128065;&#65039; ${stepData.observation}</p>`;
                     if (stepData.audio_path) sh += `<button class="v-audio-btn" onclick="new Audio('${API}${stepData.audio_path}').play()">Dinle</button>`;
                     info.innerHTML = sh;
                 }
@@ -1649,7 +1649,7 @@
 
             // GÃ¼venlik
             if (d.safety && d.safety.length) {
-                content.push({ text: 'âš ï¸ GÃœVENLÄ°K UYARILARI', style: 'sectionTitle', color: '#dc3545' });
+                content.push({ text: 'GUVENLIK UYARILARI', style: 'sectionTitle', color: '#dc3545' });
                 d.safety.forEach(s => content.push({ text: `${s.icon || ''} ${s.warning}`, margin: [10, 2, 0, 2], color: '#dc3545' }));
                 content.push({ text: '', margin: [0, 6, 0, 0] });
             }
@@ -1710,7 +1710,7 @@
                 const data = await response.json();
 
                 let html = `<div class="result-box">`;
-                html += `<h2>ğŸ“– Kelime Listesi (${data.target_level})</h2>`;
+                html += `<h2>&#128214; Kelime Listesi (${data.target_level})</h2>`;
                 html += `<p>${(data.words||[]).length} kelime bulundu</p>`;
 
                 (data.words || []).forEach(w => {
@@ -1721,7 +1721,7 @@
                     if (w.level) html += `<span class="v-level ${lvClass}">${w.level}</span>`;
                     if (w.audio_path) html += ` <button class="v-audio-btn" onclick="new Audio('${API}${w.audio_path}').play()">Dinle</button>`;
                     if (w.definition) html += `<div class="v-def">${w.definition}</div>`;
-                    if (w.turkish) html += `<div class="v-tr">ğŸ‡¹ğŸ‡· ${w.turkish}</div>`;
+                    if (w.turkish) html += `<div class="v-tr">&#127481;&#127479; ${w.turkish}</div>`;
                     if (w.example) html += `<div class="v-ex">â€œ${w.example}â€</div>`;
                     html += `</div>`;
                 });
@@ -1858,7 +1858,7 @@
                 const data = await r.json();
                 const sel = document.getElementById('dlgScenario');
                 (data.scenarios || []).forEach(s => {
-                    sel.innerHTML += `<option value="${s.id}">${s.title} (ğŸ‘¤ ${s.student_role})</option>`;
+                    sel.innerHTML += `<option value="${s.id}">${s.title} (&#128100; ${s.student_role})</option>`;
                 });
             } catch(e) {}
         }
@@ -1867,7 +1867,7 @@
         function addChatMsg(role, text, audioUrl) {
             const box = document.getElementById('dlgChatBox');
             const cls = role === 'ai' ? 'chat-ai' : 'chat-student';
-            const label = role === 'ai' ? 'ğŸ¤– AI' : 'ğŸ‘¤ Sen';
+            const label = role === 'ai' ? '&#129302; AI' : '&#128100; Sen';
             const audioBtn = audioUrl ? ` <button class="v-audio-btn" onclick="new Audio('${API}${audioUrl}').play()">Dinle</button>` : '';
             box.innerHTML += `<div class="chat-msg ${cls}"><div class="chat-role">${label}${audioBtn}</div>${text}</div>`;
             box.scrollTop = box.scrollHeight;
@@ -1940,7 +1940,7 @@
 
                 // Ã–ÄŸrenci mesajÄ±nÄ± gÃ¼ncelle
                 const msgs = document.getElementById('dlgChatBox').querySelectorAll('.chat-student');
-                if (msgs.length) msgs[msgs.length - 1].innerHTML = `<div class="chat-role">ğŸ‘¤ Sen</div>${data.student_text}`;
+                if (msgs.length) msgs[msgs.length - 1].innerHTML = `<div class="chat-role">&#128100; Sen</div>${data.student_text}`;
 
                 addChatMsg('ai', data.ai_message, data.ai_audio);
                 new Audio(`${API}${data.ai_audio}`).play();
@@ -1958,7 +1958,7 @@
         function showDialogueEval(ev) {
             const div = document.getElementById('dlgEvaluation');
             div.style.display = 'block';
-            let html = `<div class="result-box"><h2>ğŸŒŸ Diyalog DeÄŸerlendirmesi</h2>`;
+            let html = `<div class="result-box"><h2>&#127775; Diyalog DeÄŸerlendirmesi</h2>`;
             html += `<div class="eval-grid">`;
             html += `<div class="eval-item"><div class="eval-score">${ev.score || 0}</div><div class="eval-label">Genel</div></div>`;
             html += `<div class="eval-item"><div class="eval-score">${ev.grammar_score || 0}</div><div class="eval-label">Gramer</div></div>`;
@@ -1966,11 +1966,11 @@
             html += `<div class="eval-item"><div class="eval-score">${ev.fluency_score || 0}</div><div class="eval-label">AkÄ±cÄ±lÄ±k</div></div>`;
             html += `</div>`;
             if (ev.strengths && ev.strengths.length) {
-                html += `<p><strong>âœ… GÃ¼Ã§lÃ¼ Yanlar:</strong></p>`;
+                html += `<p><strong>&#9989; GÃ¼Ã§lÃ¼ Yanlar:</strong></p>`;
                 ev.strengths.forEach(s => { html += `<span class="chip-green">${s}</span> `; });
             }
             if (ev.improvements && ev.improvements.length) {
-                html += `<p style="margin-top:8px;"><strong>ğŸ’¡ GeliÅŸtirilebilir:</strong></p>`;
+                html += `<p style="margin-top:8px;"><strong>&#128161; GeliÅŸtirilebilir:</strong></p>`;
                 ev.improvements.forEach(s => { html += `<span class="chip-yellow">${s}</span> `; });
             }
             if (ev.feedback_tr) html += `<p style="margin-top:12px;"><strong>DeÄŸerlendirme:</strong> ${ev.feedback_tr}</p>`;
@@ -2012,13 +2012,13 @@
                 if (!r.ok) { resultDiv.innerHTML = '<p style="color:red;">KayÄ±t bulunamadÄ±.</p>'; return; }
                 const d = await r.json();
 
-                let html = `<div class="result-box"><h2>ğŸ“Š ${d.student_name}</h2>`;
+                let html = `<div class="result-box"><h2>&#128202; ${d.student_name}</h2>`;
                 html += `<div class="stat-card"><span class="stat-value">${d.total_activities}</span><span class="stat-label">Toplam Aktivite</span></div>`;
 
                 // Telaffuz istatistikleri
                 const p = d.pronunciation;
                 if (p && p.count > 0) {
-                    html += `<h2 style="margin-top:20px;">ğŸ™ï¸ Telaffuz</h2>`;
+                    html += `<h2 style="margin-top:20px;">&#127908; Telaffuz</h2>`;
                     html += `<div class="stat-card"><span class="stat-value">${p.avg_score}</span><span class="stat-label">Ort. Puan</span></div>`;
                     html += `<div class="stat-card"><span class="stat-value">${p.best_score}</span><span class="stat-label">En YÃ¼ksek</span></div>`;
                     html += `<div class="stat-card"><span class="stat-value">${p.avg_accuracy}%</span><span class="stat-label">Ort. DoÄŸruluk</span></div>`;
@@ -2036,7 +2036,7 @@
                 // Cevap istatistikleri
                 const a = d.answers;
                 if (a && a.count > 0) {
-                    html += `<h2 style="margin-top:20px;">âœï¸ Cevap DeÄŸerlendirme</h2>`;
+                    html += `<h2 style="margin-top:20px;">&#9997;&#65039; Cevap DeÄŸerlendirme</h2>`;
                     html += `<div class="stat-card"><span class="stat-value">${a.avg_score}</span><span class="stat-label">Ort. Puan</span></div>`;
                     html += `<div class="stat-card"><span class="stat-value">${a.best_score}</span><span class="stat-label">En YÃ¼ksek</span></div>`;
                     html += `<div class="stat-card"><span class="stat-value">${a.count}</span><span class="stat-label">Cevap SayÄ±sÄ±</span></div>`;
@@ -2045,7 +2045,7 @@
 
                 // Zaman Ã§izelgesi
                 if (d.timeline && d.timeline.length > 0) {
-                    html += `<h2 style="margin-top:20px;">ğŸ“… Zaman Ã‡izelgesi</h2>`;
+                    html += `<h2 style="margin-top:20px;">&#128197; Zaman Ã‡izelgesi</h2>`;
                     html += `<div class="timeline-bar">`;
                     d.timeline.forEach(t => {
                         const h = Math.max(8, t.score * 8);
@@ -2053,7 +2053,7 @@
                         html += `<div class="timeline-col" style="height:${h}px; background:${color};" data-tip="${t.date} | ${t.type} | ${t.score}/10"></div>`;
                     });
                     html += `</div>`;
-                    html += `<p style="font-size:14px; color:#666;">ğŸŸ¡ Telaffuz &nbsp; ğŸŸ¦ Cevap</p>`;
+                    html += `<p style="font-size:14px; color:#666;">&#128993; Telaffuz &nbsp; &#128998; Cevap</p>`;
                 }
 
                 html += `</div>`;
