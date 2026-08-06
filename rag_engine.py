@@ -143,6 +143,8 @@ Cevap:"""
 Asagidaki baglam okulun web sitesinden cikarilmis egitim kadrosu ve personel bilgisidir.
 Soruda bir kisi adi geciyorsa, baglamda o kisi hangi kampus ve brans altinda gorunuyorsa bunu acikca soyle.
 Soruda bir brans veya zumre geciyorsa, o branstaki ogretmenleri ve kampus bilgisini ozetle.
+Ogretmenle gorusmek isteyen kisileri randevu sistemi anlatmadan okul danismasina yonlendir.
+Uygunsa cevabi su mantikla kur: "[Ad Soyad], [kampus] kampusumuzde [brans] ogretmenlerimizden biridir. Gorusmek isterseniz danismaya basvurarak uygunluk durumunu ogrenebilirsiniz."
 Baglamda acikca olmayan bilgiyi uydurma.
 Cevabi Turkce ver.
 
