@@ -9,6 +9,7 @@ import requests
 API_BASE_URL = os.getenv("ROBOT_API_BASE_URL", "https://robot-app-1047763414877.europe-west1.run.app")
 SESSION_ID = os.getenv("ROBOT_SESSION_ID", f"pi5-{uuid.uuid4().hex[:10]}")
 CAMERA_INDEX = int(os.getenv("ROBOT_CAMERA_INDEX", "0"))
+CAMERA_BYPASS = os.getenv("ROBOT_CAMERA_BYPASS", "1") == "1"
 
 DETECTION_COOLDOWN_SECONDS = float(os.getenv("ROBOT_DETECTION_COOLDOWN", "30"))
 PERSON_CONFIRM_FRAMES = int(os.getenv("ROBOT_PERSON_CONFIRM_FRAMES", "2"))
@@ -44,6 +45,17 @@ def open_camera():
 
 
 def main():
+    if CAMERA_BYPASS:
+        print(f"Session: {SESSION_ID}")
+        print(f"API: {API_BASE_URL}")
+        print(f"Kamera bypass aktif. Her {DETECTION_COOLDOWN_SECONDS:.0f} saniyede bir karşılama gönderilecek.")
+        while True:
+            try:
+                notify_backend("timer")
+            except Exception as exc:
+                print(f"Backend bildirimi basarisiz: {exc}")
+            time.sleep(DETECTION_COOLDOWN_SECONDS)
+
     hog = cv2.HOGDescriptor()
     hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
     motion_detector = cv2.createBackgroundSubtractorMOG2(
