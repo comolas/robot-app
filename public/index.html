@@ -1024,9 +1024,11 @@
 
         function formatAnswerText(text) {
             const normalized = (text || '')
+                .replace(/\\\*/g, '*')
                 .replace(/\r\n/g, '\n')
                 .replace(/[ \t]+\n/g, '\n')
                 .replace(/\n{2,}/g, '\n')
+                .replace(/\*+/g, '')
                 .trim();
             const escaped = normalized
                 .replace(/&/g, '&amp;')
@@ -1035,7 +1037,6 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
             return escaped
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n/g, '<br>');
         }
 
