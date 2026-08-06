@@ -703,23 +703,28 @@ async def voice_ask(audio: UploadFile = File(...)):
     # STT ile metne çevir
     transcript = ""
     errors = []
+    stt_debug = []
     if stt_service:
         try:
-            transcript = stt_service.transcribe(str(temp_path), language_code="tr-TR")
+            result = stt_service.transcribe_with_metadata(str(temp_path), language_code="tr-TR")
+            transcript = result["transcript"]
+            stt_debug.append(result)
         except Exception as e:
             errors.append(f"tr-TR: {e}")
     if not transcript and stt_service:
         try:
-            transcript = stt_service.transcribe(str(temp_path), language_code="en-US")
+            result = stt_service.transcribe_with_metadata(str(temp_path), language_code="en-US")
+            transcript = result["transcript"]
+            stt_debug.append(result)
         except Exception as e:
             errors.append(f"en-US: {e}")
 
     if not transcript:
-        detail = " ".join(errors)
+        detail = " ".join(errors) or json.dumps(stt_debug, ensure_ascii=False)
         print(f"STT failed for {temp_path.name}: {detail}")
         return {"transcript": "", "error": "Ses anlaşılamadı. Lütfen mikrofona biraz daha yakın ve net konuşarak tekrar deneyin.", "debug": detail}
 
-    return {"transcript": transcript}
+    return {"transcript": transcript, "debug": stt_debug}
 
 @app.get("/")
 async def root():

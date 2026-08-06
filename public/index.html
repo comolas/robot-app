@@ -1096,6 +1096,7 @@
 
         async function toggleVoiceInput() {
             if (voiceRecorder && voiceRecorder.state === 'recording') {
+                try { voiceRecorder.requestData(); } catch (e) {}
                 voiceRecorder.stop();
                 return;
             }
@@ -1110,7 +1111,9 @@
                 voiceChunks = [];
                 const mimeType = getSupportedAudioMimeType();
                 voiceRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-                voiceRecorder.ondataavailable = e => voiceChunks.push(e.data);
+                voiceRecorder.ondataavailable = e => {
+                    if (e.data && e.data.size > 0) voiceChunks.push(e.data);
+                };
                 voiceRecorder.onstop = async () => {
                     stream.getTracks().forEach(t => t.stop());
                     document.getElementById('voiceBtn').textContent = '🎙️';
@@ -1119,7 +1122,7 @@
                     const blob = new Blob(voiceChunks, { type: voiceRecorder.mimeType || mimeType || 'audio/webm' });
                     await sendVoiceCommand(blob);
                 };
-                voiceRecorder.start();
+                voiceRecorder.start(250);
                 document.getElementById('voiceBtn').textContent = '⏹️';
                 document.getElementById('voiceStatus').style.display = 'block';
                 document.getElementById('welcomeBox').style.display = 'none';
@@ -1127,7 +1130,10 @@
                 setMood('listening', 'Dinliyorum...');
                 switchVideo('listening');
                 setTimeout(() => {
-                    if (voiceRecorder && voiceRecorder.state === 'recording') voiceRecorder.stop();
+                    if (voiceRecorder && voiceRecorder.state === 'recording') {
+                        try { voiceRecorder.requestData(); } catch (e) {}
+                        voiceRecorder.stop();
+                    }
                 }, 15000);
             } catch(e) { alert('Mikrofon erişimi reddedildi.'); }
         }
@@ -1136,6 +1142,11 @@
             const answerDiv = document.getElementById('answer');
             answerDiv.style.display = 'block';
             answerDiv.innerHTML = SKL.minimal;
+
+            if (!blob || blob.size < 1200) {
+                answerDiv.innerHTML = '<p style="color:red;">Ses kaydı çok kısa veya boş görünüyor. Lütfen butona bastıktan sonra 1-2 saniye bekleyip konuşun.</p>';
+                return;
+            }
 
             const fd = new FormData();
             fd.append('audio', blob, audioFileNameForMime(blob.type || 'audio/webm'));

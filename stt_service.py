@@ -1,6 +1,6 @@
-import os
-from google.cloud import speech
 from pathlib import Path
+
+from google.cloud import speech
 
 
 class STTService:
@@ -8,13 +8,16 @@ class STTService:
         self.client = speech.SpeechClient()
 
     def transcribe(self, audio_path: str, language_code: str = "en-US") -> str:
-        """Ses dosyasını metne çevir. WAV, WEBM, MP3 destekler. Uzun sesler için LongRunning kullanır."""
+        result = self.transcribe_with_metadata(audio_path, language_code)
+        return result["transcript"]
+
+    def transcribe_with_metadata(self, audio_path: str, language_code: str = "en-US") -> dict:
         with open(audio_path, "rb") as f:
             audio_content = f.read()
 
         audio = speech.RecognitionAudio(content=audio_content)
-
         ext = Path(audio_path).suffix.lower()
+
         if ext == ".webm":
             encoding = speech.RecognitionConfig.AudioEncoding.WEBM_OPUS
             sample_rate = None
@@ -41,11 +44,17 @@ class STTService:
 
         config = speech.RecognitionConfig(**config_kwargs)
 
-        # 1 dakikadan kısa sesler için sync, uzunlar için async
         if len(audio_content) < 960_000:
             response = self.client.recognize(config=config, audio=audio)
         else:
             operation = self.client.long_running_recognize(config=config, audio=audio)
             response = operation.result(timeout=120)
 
-        return " ".join(result.alternatives[0].transcript for result in response.results)
+        transcript = " ".join(result.alternatives[0].transcript for result in response.results)
+        return {
+            "transcript": transcript,
+            "result_count": len(response.results),
+            "audio_bytes": len(audio_content),
+            "encoding": encoding.name,
+            "language_code": language_code,
+        }
