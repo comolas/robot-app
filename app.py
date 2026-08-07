@@ -94,26 +94,19 @@ def ensure_rag_engine() -> RAGEngine:
         raise HTTPException(status_code=500, detail="GOOGLE_API_KEY bulunamadi")
 
     engine = RAGEngine(api_key)
+    web_cache_path = "./data/okul_bilgileri_web.md"
+    file_path = "./data/okul_bilgileri.md"
     if os.path.exists("./vectordb"):
         print("Mevcut vektor veritabani yukleniyor...")
         engine.load_existing_db()
+    elif os.path.exists(web_cache_path):
+        print("Web cache dosyasindan vektor veritabani olusturuluyor...")
+        engine.load_documents(web_cache_path)
+    elif os.path.exists(file_path):
+        print("Markdown dosyasindan vektor veritabani olusturuluyor...")
+        engine.load_documents(file_path)
     else:
-        school_url = os.getenv("SCHOOL_WEBSITE_URL", "")
-        if school_url:
-            try:
-                print(f"Web sitesi taraniyor: {school_url}")
-                char_count = engine.load_from_url(school_url)
-                print(f"Web sitesinden {char_count} karakter yuklendi.")
-            except Exception as e:
-                print(f"Web sitesi taranamadi: {e}")
-                if os.path.exists("./data/okul_bilgileri.md"):
-                    print("Markdown dosyasindan yukleniyor...")
-                    engine.load_documents("./data/okul_bilgileri.md")
-        elif os.path.exists("./data/okul_bilgileri.md"):
-            print("Vektor veritabani olusturuluyor...")
-            engine.load_documents("./data/okul_bilgileri.md")
-        else:
-            print("UYARI: Veri kaynagi bulunamadi!")
+        print("UYARI: Veri kaynagi bulunamadi!")
 
     rag_engine = engine
     return rag_engine
@@ -461,26 +454,31 @@ async def manual_cleanup():
 
 @app.post("/reload-data")
 async def reload_data(source: str = "auto"):
-    """Verileri yeniden yükle. source: auto, web, file"""
+    """Verileri yeniden yukle. source: auto/cache/file/web"""
     global rag_engine
     api_key = os.getenv("GOOGLE_API_KEY")
     rag_engine = RAGEngine(api_key)
 
     school_url = os.getenv("SCHOOL_WEBSITE_URL", "")
+    web_cache_path = "./data/okul_bilgileri_web.md"
+    file_path = "./data/okul_bilgileri.md"
 
-    if source in ("auto", "web") and school_url:
+    if source == "web" and school_url:
         try:
             char_count = rag_engine.load_from_url(school_url)
-            return {"message": f"Web sitesinden {char_count} karakter yüklendi.", "source": "web"}
+            return {"message": f"Web sitesinden {char_count} karakter yuklendi.", "source": "web"}
         except Exception as e:
-            if source == "web":
-                return {"message": f"Web sitesi taranamadı: {e}", "source": "error"}
+            return {"message": f"Web sitesi taranamadi: {e}", "source": "error"}
 
-    if os.path.exists("./data/okul_bilgileri.md"):
-        rag_engine.load_documents("./data/okul_bilgileri.md")
-        return {"message": "Markdown dosyasından yüklendi.", "source": "file"}
+    if source in ("auto", "cache", "file") and os.path.exists(web_cache_path):
+        rag_engine.load_documents(web_cache_path)
+        return {"message": "okul_bilgileri_web.md dosyasindan yuklendi.", "source": "cache"}
 
-    return {"message": "Veri kaynağı bulunamadı.", "source": "none"}
+    if os.path.exists(file_path):
+        rag_engine.load_documents(file_path)
+        return {"message": "okul_bilgileri.md dosyasindan yuklendi.", "source": "file"}
+
+    return {"message": "Veri kaynagi bulunamadi.", "source": "none"}
 
 @app.get("/english/lessons")
 async def list_lessons():
