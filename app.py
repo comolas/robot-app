@@ -191,6 +191,8 @@ class Answer(BaseModel):
     answers: list[str] = []
     question_audio_paths: list[str] = []
     pdf_name: str = ""
+    pdf_page: int = 0
+    page_audio_path: str = ""
     language: str = ""
 
 class EvaluateRequest(BaseModel):
@@ -313,6 +315,8 @@ Kurallar:
 4. Örnekler günlük hayattan seçilsin.
 5. Kolay, orta ve zor seviyede en az birer örnek ver.
 6. Sonunda 3 kısa kontrol sorusu sor.
+6a. Kontrol sorulari sadece bilgi sormasin; ogrenciyi konu ile ilgili kendi cumlesini kurmaya tesvik etsin.
+6b. Ornek: Konu Simple Past Tense ise "Dun yaptigin bir seyi Simple Past Tense kullanarak bir cumleyle anlat." gibi cumle kurdur.
 7. Cevap Türkçe olsun. İngilizce ifadeler gerekiyorsa yanında Türkçe açıklamasını ver.
 8. Bilgiyi sayfa içeriğine dayandır; sayfada olmayan ayrıntıları uydurma.
 
@@ -451,6 +455,7 @@ async def ask_question(question: Question):
                 # TTS ile seslendir (doğru dilde)
                 audio_filename = f"page_{hashlib.md5((answer + tts_lang).encode()).hexdigest()}.mp3"
                 audio_path = ""
+                page_audio_path = ""
                 if tts_service:
                     try:
                         cached_path = tts_service.text_to_speech_lang(
@@ -461,6 +466,18 @@ async def ask_question(question: Question):
                         audio_path = f"/audio/{Path(cached_path).name}"
                     except Exception as exc:
                         print(f"PDF TTS hatasi: {exc}")
+                    if is_teach_mode:
+                        try:
+                            page_tts_lang = "en-US" if is_english else "tr-TR"
+                            page_audio_filename = f"page_text_{hashlib.md5((page_text + page_tts_lang).encode()).hexdigest()}.mp3"
+                            page_cached_path = tts_service.text_to_speech_lang(
+                                truncate_for_tts(page_text),
+                                page_audio_filename,
+                                language_code=page_tts_lang,
+                            )
+                            page_audio_path = f"/audio/{Path(page_cached_path).name}"
+                        except Exception as exc:
+                            print(f"PDF sayfa metni TTS hatasi: {exc}")
 
                 questions = []
                 answers_list = []
@@ -487,6 +504,8 @@ async def ask_question(question: Question):
                     answers=answers_list,
                     question_audio_paths=q_audio_paths,
                     pdf_name=pdf_name,
+                    pdf_page=page_num or 0,
+                    page_audio_path=page_audio_path,
                     language=lang,
                 )
             except Exception as e:

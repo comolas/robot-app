@@ -1417,10 +1417,11 @@
 
                 // PDF sayfa gÃ¶rselini gÃ¶ster
                 const pageMatch = data.answer.match(/Sayfa (\d+)/);
-                const isPdf = pageMatch && pdfState.name;
+                const explicitPdfPage = data.pdf_name && data.pdf_page;
+                const isPdf = explicitPdfPage || (pageMatch && pdfState.name);
 
                 if (isPdf) {
-                    const pg = parseInt(pageMatch[1]);
+                    const pg = explicitPdfPage ? parseInt(data.pdf_page) : parseInt(pageMatch[1]);
                     setMood('reading', 'Sayfa okunuyor...');
                     // PDF adÄ±nÄ± API yanÄ±tÄ±ndan al
                     if (data.pdf_name) {
@@ -1434,8 +1435,14 @@
                         } catch(e) {}
                     }
                     showPdfPage(pdfState.name, pg, pdfState.totalPages || 999);
-                    answerDiv.innerHTML = '';
-                    answerDiv.style.display = 'none';
+                    if (explicitPdfPage && data.answer) {
+                        const pageAudio = data.page_audio_path ? `<button class="btn btn-primary btn-inline" style="margin:8px 8px 8px 0;" onclick="playRobotAudio('${API}${data.page_audio_path}', '')">PDF Metnini Dinle</button>` : '';
+                        const lessonAudio = data.audio_path ? `<button class="btn btn-success btn-inline" style="margin:8px 0;" onclick="playRobotAudio('${API}${data.audio_path}', '')">Konu Anlatımını Dinle</button>` : '';
+                        answerDiv.innerHTML = `${pageAudio}${lessonAudio}<br><strong>Cevap:</strong><br>${formatAnswerText(data.answer)}`;
+                    } else {
+                        answerDiv.innerHTML = '';
+                        answerDiv.style.display = 'none';
+                    }
                 } else {
                     answerDiv.innerHTML = `<strong>Cevap:</strong><br>${formatAnswerText(data.answer)}`;
                 }
@@ -1444,7 +1451,7 @@
                     document.getElementById('faceBar').style.display = 'none';
                 }
 
-                if (data.audio_path) {
+                if (data.audio_path && !explicitPdfPage) {
                     setMood('speaking', 'KonuÅŸuyor...');
                     const audio = playRobotAudio(`${API}${data.audio_path}`, data.answer || '');
                     audio.onended = () => setMood('happy', '');
