@@ -236,7 +236,7 @@ Cevap:"""
         """Sorunun PDF okuma komutu olup olmadığını kontrol et.
         Dönüş: {"pdf": dosya_adı, "page": sayfa_no} veya None"""
         q = self._normalize_tr(question)
-        read_keywords = ["oku", "ac", "sayfa", "page", "pdf"]
+        read_keywords = ["oku", "ac", "sayfa", "page", "pdf", "anlat", "acikla", "ozetle", "ders"]
         if not any(k in q for k in read_keywords):
             return None
 
@@ -262,7 +262,9 @@ Cevap:"""
         m = re.search(r'(\d+)\s*\.?\s*sayfa|sayfa\s*(\d+)|page\s*(\d+)', q)
         if m:
             page = int(next(g for g in m.groups() if g))
-        return {"pdf": str(best_pdf), "page": page}
+        teach_keywords = ["anlat", "acikla", "ozetle", "ders"]
+        mode = "teach" if any(k in q for k in teach_keywords) else "read"
+        return {"pdf": str(best_pdf), "page": page, "mode": mode}
 
     def ask(self, question: str) -> str:
         """Soruya cevap ver"""

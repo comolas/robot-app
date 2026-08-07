@@ -261,6 +261,32 @@ def make_audio_response(answer: str, session_id: str = "", user_name: str = "", 
         audio_path = f"/audio/{Path(cached_path).name}"
     return Answer(answer=answer, audio_path=audio_path, session_id=session_id, user_name=user_name, face_state=face_state, **extra)
 
+def generate_lesson_explanation(page_text: str, pdf_name: str, page_num: int | None, language: str) -> str:
+    engine = ensure_rag_engine()
+    page_label = f"{page_num}. sayfa" if page_num else "ilgili sayfalar"
+    lesson_kind = "İngilizce" if language == "en" else "ders"
+    prompt = f"""Sen sabırlı, somut örneklerle anlatan bir öğretmensin.
+
+Kaynak: {pdf_name} - {page_label}
+Ders türü: {lesson_kind}
+
+Aşağıdaki sayfa içeriğini öğrenciye ders anlatır gibi açıkla.
+Kurallar:
+1. Başta sayfanın ana konusunu kısa söyle.
+2. Konuyu parça parça, somut ve anlaşılır şekilde anlat.
+3. İpuçları, püf noktalar, tuzaklar ve dikkat edilmesi gerekenleri mutlaka belirt.
+4. Örnekler günlük hayattan seçilsin.
+5. Kolay, orta ve zor seviyede en az birer örnek ver.
+6. Sonunda 3 kısa kontrol sorusu sor.
+7. Cevap Türkçe olsun. İngilizce ifadeler gerekiyorsa yanında Türkçe açıklamasını ver.
+8. Bilgiyi sayfa içeriğine dayandır; sayfada olmayan ayrıntıları uydurma.
+
+Sayfa içeriği:
+{page_text[:7000]}
+
+Ders anlatımı:"""
+    return engine.llm.invoke(prompt).content
+
 @app.post("/session/start", response_model=Answer)
 async def start_session(req: SessionStart):
     session = get_session(req.session_id)
@@ -367,7 +393,7 @@ async def ask_question(question: Question):
                 pdf_name_lower = rag_engine._normalize_tr(pdf_name)
                 is_english = "ingilizce" in pdf_name_lower or "english" in pdf_name_lower
                 lang = "en" if is_english else "tr"
-                tts_lang = "en-US" if is_english else "tr-TR"
+                tts_lang = "tr-TR" if pdf_cmd.get("mode") == "teach" else ("en-US" if is_english else "tr-TR")
 
                 # PDF metnini oku
                 import fitz
@@ -378,20 +404,25 @@ async def ask_question(question: Question):
                 else:
                     page_text = "\n".join(p.get_text() for p in doc)
 
+                page_info = f" (Sayfa {page_num})" if page_num else ""
+                is_teach_mode = pdf_cmd.get("mode") == "teach"
+                if is_teach_mode:
+                    answer = generate_lesson_explanation(page_text, pdf_name, page_num, lang)
+                else:
+                    answer = f"PDF okunuyor{page_info}:\n\n{page_text[:2000]}"
                 # TTS ile seslendir (doğru dilde)
-                audio_filename = f"page_{hashlib.md5(page_text.encode()).hexdigest()}.mp3"
+                audio_filename = f"page_{hashlib.md5((answer + tts_lang).encode()).hexdigest()}.mp3"
                 audio_path = ""
                 if tts_service:
-                    cached_path = tts_service.text_to_speech_lang(page_text[:5000], audio_filename, language_code=tts_lang)
+                    cached_path = tts_service.text_to_speech_lang(answer[:5000], audio_filename, language_code=tts_lang)
                     audio_path = f"/audio/{Path(cached_path).name}"
 
-                page_info = f" (Sayfa {page_num})" if page_num else ""
                 questions = []
                 answers_list = []
                 q_audio_paths = []
 
                 # İngilizce kitap ise soru üret
-                if is_english and english_teacher:
+                if is_english and english_teacher and not is_teach_mode:
                     english_teacher.current_text = page_text
                     qa_pairs = english_teacher.generate_questions(3)
                     questions = [item["question"] for item in qa_pairs]
@@ -401,8 +432,7 @@ async def ask_question(question: Question):
                         q_audio_paths.append(f"/audio/{Path(qpath).name}")
 
                 questions_text = "\n".join(f"{i+1}. {q}" for i, q in enumerate(questions))
-                answer = f"PDF okunuyor{page_info}:\n\n{page_text[:2000]}"
-                if questions_text:
+                if questions_text and not is_teach_mode:
                     answer += f"\n\n---\n\nSorular:\n{questions_text}"
 
                 return Answer(
