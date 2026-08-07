@@ -160,8 +160,15 @@
             position: fixed; inset: 0; z-index: 2000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 28px; padding: 24px; background: var(--bg); color: var(--text);
+            overflow: hidden;
             transition: opacity 0.25s ease, visibility 0.25s ease;
         }
+        #idleScreen::before {
+            content: ''; position: absolute; inset: 0;
+            background: url('https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/data_koleji.png?alt=media&token=8f48175f-9230-40eb-8c06-adf4698a02ca') center/contain no-repeat;
+            opacity: 0.5; pointer-events: none;
+        }
+        #idleScreen > * { position: relative; z-index: 1; }
         #idleScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         #appShell { display: none; }
         #appShell.active { display: block; }
@@ -730,7 +737,7 @@
         const PERSON_DETECTION_INTERVAL_MS = 700;
         const USE_BROWSER_CAMERA_PRESENCE = false;
         const USE_PI_PRESENCE = false;
-        const AUTO_GREETING_INTERVAL_MS = 30000;
+        const AUTO_GREETING_INTERVAL_MS = 15 * 60 * 1000;
         const AUTO_GREETING_TEXT = 'Merhaba okulumuza hoş geldiniz. Bilgi almak için Bilgi Al butonuna tıklayabilirsiniz.';
         let idleTimer = null;
         let appIsOpen = false;
