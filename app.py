@@ -270,6 +270,21 @@ def truncate_for_tts(text: str, max_bytes: int = 4500) -> str:
         return text or ""
     return encoded[:max_bytes].decode("utf-8", errors="ignore").rsplit(" ", 1)[0] + "..."
 
+def llm_content_to_text(content) -> str:
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                parts.append(str(item.get("text") or item.get("content") or ""))
+            else:
+                parts.append(str(item))
+        return "\n".join(part for part in parts if part)
+    return str(content)
+
 def generate_lesson_explanation(page_text: str, pdf_name: str, page_num: int | None, language: str) -> str:
     engine = ensure_rag_engine()
     page_label = f"{page_num}. sayfa" if page_num else "ilgili sayfalar"
@@ -294,7 +309,7 @@ Sayfa içeriği:
 {page_text[:7000]}
 
 Ders anlatımı:"""
-    return engine.llm.invoke(prompt).content
+    return llm_content_to_text(engine.llm.invoke(prompt).content)
 
 @app.post("/session/start", response_model=Answer)
 async def start_session(req: SessionStart):
@@ -419,6 +434,7 @@ async def ask_question(question: Question):
                     answer = generate_lesson_explanation(page_text, pdf_name, page_num, lang)
                 else:
                     answer = f"PDF okunuyor{page_info}:\n\n{page_text[:2000]}"
+                answer = llm_content_to_text(answer)
                 # TTS ile seslendir (doğru dilde)
                 audio_filename = f"page_{hashlib.md5((answer + tts_lang).encode()).hexdigest()}.mp3"
                 audio_path = ""
