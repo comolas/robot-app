@@ -165,12 +165,9 @@ Cevap:"""
 
     def _looks_like_staff_question(self, question: str) -> bool:
         q = self._normalize_tr(question)
-        staff_words = [
-            "ogretmen", "egitim kadro", "kadro", "zumre", "mudur", "rehberlik",
-            "turk dili", "edebiyat", "matematik", "fizik", "kimya", "biyoloji",
-            "ingilizce", "almanca", "cografya", "tarih", "felsefe", "din kulturu",
-            "beden egitimi", "makine", "elektrik",
-        ]
+        if any(word in q for word in ["bolum", "bolumu", "alan", "alani", "program"]):
+            return False
+        staff_words = ["ogretmen", "egitim kadro", "kadro", "zumre", "mudur", "rehberlik"]
         return any(word in q for word in staff_words) or bool(self._extract_person_name_query(question))
 
     def _find_staff_context(self, question: str, content: str) -> str:
