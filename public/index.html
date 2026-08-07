@@ -508,7 +508,7 @@
     </section>
     <main id="appShell" aria-hidden="true">
     <button id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">Tema</button>
-    <h1><a href="" onclick="location.reload(); return false;" style="text-decoration:none; color:inherit;"><img src="https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/data_koleji.jpg?alt=media&token=db8f20c4-124d-4a25-b80f-1b5e4b0b71b1" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"></a>Data Koleji Okul Tanıtım Robotu</h1>
+    <h1><a href="#" onclick="showQuickCardsScreen(); return false;" style="text-decoration:none; color:inherit;"><img src="https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/data_koleji.jpg?alt=media&token=db8f20c4-124d-4a25-b80f-1b5e4b0b71b1" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"></a>Data Koleji Okul Tanıtım Robotu</h1>
 
     <div id="welcomeBox" style="padding:20px; text-align:center; margin-bottom:20px;">
         <video id="robotVideo" src="https://firebasestorage.googleapis.com/v0/b/kutuphaneapp-91a49.firebasestorage.app/o/Cartoon_boy_waving_and_speaking_202606212234.mp4?alt=media&token=5de8d92a-9ba5-440d-8db9-8da48f2e3c39"
@@ -1080,6 +1080,23 @@
                     answer.includes('nasil yardimci')
                 )
             );
+        }
+
+        function showQuickCardsScreen() {
+            appIsOpen = true;
+            resetIdleTimer();
+            clearActiveOutputs();
+            const idle = document.getElementById('idleScreen');
+            const shell = document.getElementById('appShell');
+            const welcome = document.getElementById('welcomeBox');
+            if (idle) idle.classList.add('hidden');
+            if (shell) {
+                shell.classList.add('active');
+                shell.setAttribute('aria-hidden', 'false');
+            }
+            if (welcome) welcome.style.display = 'block';
+            setMood('happy', '');
+            switchVideo('default');
         }
 
         function showIdleScreen() {
