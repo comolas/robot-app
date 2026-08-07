@@ -258,7 +258,7 @@ def make_audio_response(answer: str, session_id: str = "", user_name: str = "", 
     audio_path = ""
     if tts_service:
         try:
-            cached_path = tts_service.text_to_speech(truncate_for_tts(answer))
+            cached_path = tts_service.text_to_speech(truncate_for_tts(clean_spoken_markdown(answer)))
             audio_path = f"/audio/{Path(cached_path).name}"
         except Exception as exc:
             print(f"TTS hatasi: {exc}")
@@ -285,6 +285,17 @@ def llm_content_to_text(content) -> str:
         return "\n".join(part for part in parts if part)
     return str(content)
 
+def clean_spoken_markdown(text: str) -> str:
+    value = llm_content_to_text(text)
+    value = re.sub(r"(?m)^\s*-{3,}\s*$", "", value)
+    value = re.sub(r"(?m)^\s*#{1,6}\s*", "", value)
+    value = value.replace("\\*", "*")
+    value = re.sub(r"\*+", "", value)
+    value = re.sub(r"`+", "", value)
+    value = re.sub(r"(?m)^\s*[-•]\s+", "", value)
+    value = re.sub(r"\n{3,}", "\n\n", value)
+    return value.strip()
+
 def generate_lesson_explanation(page_text: str, pdf_name: str, page_num: int | None, language: str) -> str:
     engine = ensure_rag_engine()
     page_label = f"{page_num}. sayfa" if page_num else "ilgili sayfalar"
@@ -305,11 +316,13 @@ Kurallar:
 7. Cevap Türkçe olsun. İngilizce ifadeler gerekiyorsa yanında Türkçe açıklamasını ver.
 8. Bilgiyi sayfa içeriğine dayandır; sayfada olmayan ayrıntıları uydurma.
 
+9. Markdown kullanma. #, ###, ---, *, **, *** veya kod blogu karakterleri yazma.
+10. Basliklari sade metin olarak yaz. Ornek: "1. Sayfanin Ana Konusu"
 Sayfa içeriği:
 {page_text[:7000]}
 
 Ders anlatımı:"""
-    return llm_content_to_text(engine.llm.invoke(prompt).content)
+    return clean_spoken_markdown(engine.llm.invoke(prompt).content)
 
 @app.post("/session/start", response_model=Answer)
 async def start_session(req: SessionStart):
@@ -492,7 +505,7 @@ async def ask_question(question: Question):
         
         audio_path = ""
         if tts_service:
-            cached_path = tts_service.text_to_speech(answer)
+            cached_path = tts_service.text_to_speech(truncate_for_tts(clean_spoken_markdown(answer)))
             audio_path = f"/audio/{Path(cached_path).name}"
         
         return Answer(answer=answer, audio_path=audio_path, session_id=question.session_id, user_name=user_name)
