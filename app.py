@@ -257,9 +257,18 @@ def is_positive_feedback(text: str) -> bool:
 def make_audio_response(answer: str, session_id: str = "", user_name: str = "", face_state: str = "", **extra) -> Answer:
     audio_path = ""
     if tts_service:
-        cached_path = tts_service.text_to_speech(answer)
-        audio_path = f"/audio/{Path(cached_path).name}"
+        try:
+            cached_path = tts_service.text_to_speech(truncate_for_tts(answer))
+            audio_path = f"/audio/{Path(cached_path).name}"
+        except Exception as exc:
+            print(f"TTS hatasi: {exc}")
     return Answer(answer=answer, audio_path=audio_path, session_id=session_id, user_name=user_name, face_state=face_state, **extra)
+
+def truncate_for_tts(text: str, max_bytes: int = 4500) -> str:
+    encoded = (text or "").encode("utf-8")
+    if len(encoded) <= max_bytes:
+        return text or ""
+    return encoded[:max_bytes].decode("utf-8", errors="ignore").rsplit(" ", 1)[0] + "..."
 
 def generate_lesson_explanation(page_text: str, pdf_name: str, page_num: int | None, language: str) -> str:
     engine = ensure_rag_engine()
@@ -414,8 +423,15 @@ async def ask_question(question: Question):
                 audio_filename = f"page_{hashlib.md5((answer + tts_lang).encode()).hexdigest()}.mp3"
                 audio_path = ""
                 if tts_service:
-                    cached_path = tts_service.text_to_speech_lang(answer[:5000], audio_filename, language_code=tts_lang)
-                    audio_path = f"/audio/{Path(cached_path).name}"
+                    try:
+                        cached_path = tts_service.text_to_speech_lang(
+                            truncate_for_tts(answer),
+                            audio_filename,
+                            language_code=tts_lang,
+                        )
+                        audio_path = f"/audio/{Path(cached_path).name}"
+                    except Exception as exc:
+                        print(f"PDF TTS hatasi: {exc}")
 
                 questions = []
                 answers_list = []
@@ -444,8 +460,9 @@ async def ask_question(question: Question):
                     pdf_name=pdf_name,
                     language=lang,
                 )
-            except ValueError as e:
-                return Answer(answer=str(e), audio_path="")
+            except Exception as e:
+                print(f"PDF isleme hatasi: {e}")
+                return Answer(answer=f"Bu sayfayı işlerken bir sorun oluştu: {e}", audio_path="")
 
         # Personel / ogretmen / zumre sorularinda once kesin metin eslesmesi dene
         answer = rag_engine.answer_staff_question(question.question)
