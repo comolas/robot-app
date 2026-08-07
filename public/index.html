@@ -1068,6 +1068,20 @@
             if (voiceStatus) voiceStatus.style.display = 'none';
         }
 
+        function shouldShowQuickCardsAfterAnswer(data) {
+            const answer = (data && data.answer ? data.answer : '').toLocaleLowerCase('tr-TR');
+            return Boolean(
+                data &&
+                data.user_name &&
+                (
+                    answer.includes('ne öğrenmek istersin') ||
+                    answer.includes('ne ogrenmek istersin') ||
+                    answer.includes('nasıl yardımcı') ||
+                    answer.includes('nasil yardimci')
+                )
+            );
+        }
+
         function showIdleScreen() {
             appIsOpen = false;
             clearTimeout(idleTimer);
@@ -1401,6 +1415,10 @@
                     answerDiv.style.display = 'none';
                 } else {
                     answerDiv.innerHTML = `<strong>Cevap:</strong><br>${formatAnswerText(data.answer)}`;
+                }
+                if (shouldShowQuickCardsAfterAnswer(data)) {
+                    document.getElementById('welcomeBox').style.display = 'block';
+                    document.getElementById('faceBar').style.display = 'none';
                 }
 
                 if (data.audio_path) {
