@@ -25,7 +25,7 @@ Gonderilen govde:
 Robotun karşilama cumlesi:
 
 ```text
-Merhaba, okulumuza hos geldiniz. Bilgi almak icin Bilgi Al butonuna tiklayabilirsiniz.
+Merhaba, okulumuza hoş geldiniz. Bilgi almak icin Bilgi Al butonuna tıklayabilirsiniz.
 ```
 
 ## Tam ekran
