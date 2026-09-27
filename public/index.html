@@ -42,6 +42,8 @@
         let speakingAction;
         let blinkAction;
         let nextBlinkAt = performance.now() + 3500;
+        let ambientActions = [];
+        let nextAmbientActionAt = performance.now() + 6000;
         let activeSpeech = null;
         let currentViseme = 'VIS_SIL';
         let visemeStrength = 0;
@@ -109,11 +111,24 @@
             nextBlinkAt = performance.now() + 4200 + Math.random() * 3200;
         }
 
+        function scheduleNextAmbientAction(minimumDelay = 7000) {
+            nextAmbientActionAt = performance.now() + minimumDelay + Math.random() * 6500;
+        }
+
+        function updateAmbientAction() {
+            if (activeSpeech || !ambientActions.length || performance.now() < nextAmbientActionAt) return;
+            const candidates = ambientActions.filter(action => action !== window.characterAction);
+            const action = candidates[Math.floor(Math.random() * candidates.length)] || ambientActions[0];
+            playCharacterAction(action, 0.3);
+            scheduleNextAmbientAction(8500);
+        }
+
         function animateCharacter() {
             requestAnimationFrame(animateCharacter);
             const delta = Math.min(clock?.getDelta() || 0, 0.05);
             if (mixer) mixer.update(delta);
             updateBlink();
+            updateAmbientAction();
             updateLipSync();
             renderer?.render(scene, camera);
         }
@@ -176,6 +191,29 @@
                     blinkAction = mixer.clipAction(clips.BLINK);
                     blinkAction.clampWhenFinished = false;
                 }
+                const ambientClipNames = [
+                    'GESTURE_OPEN_HAND',
+                    'GESTURE_EXPLAIN',
+                    'GESTURE_EMPHASIS',
+                    'HEAD_NOD',
+                    'HEAD_TILT',
+                    'LISTENING',
+                    'THINKING'
+                ];
+                ambientActions = ambientClipNames
+                    .filter(name => clips[name])
+                    .map(name => {
+                        const action = mixer.clipAction(clips[name]);
+                        action.setLoop(THREE.LoopOnce, 1);
+                        action.clampWhenFinished = false;
+                        return action;
+                    });
+                mixer.addEventListener('finished', event => {
+                    if (ambientActions.includes(event.action) && !activeSpeech) {
+                        playCharacterAction(idleAction, 0.35);
+                        scheduleNextAmbientAction();
+                    }
+                });
                 playCharacterAction(idleAction, 0);
                 stage.classList.add('is-ready');
             }, undefined, error => {
@@ -202,6 +240,7 @@
             currentViseme = 'VIS_SIL';
             visemeStrength = 0;
             playCharacterAction(idleAction);
+            scheduleNextAmbientAction(5000);
         };
     </script>
     <script type="module">
