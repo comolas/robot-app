@@ -11,6 +11,182 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const MODEL_URL = './Character_TR_Viseme_WEB_v04.glb';
+        const VISEMES = ['VIS_SIL', 'VIS_A', 'VIS_E', 'VIS_I', 'VIS_O', 'VIS_U', 'VIS_MBP', 'VIS_FV', 'VIS_SZ', 'VIS_SHCH', 'VIS_TDN', 'VIS_KG', 'VIS_LR'];
+        const LETTER_VISEMES = {
+            a: 'VIS_A', e: 'VIS_E', i: 'VIS_I', '\u0131': 'VIS_I', o: 'VIS_O', '\u00f6': 'VIS_O', u: 'VIS_U', '\u00fc': 'VIS_U',
+            m: 'VIS_MBP', b: 'VIS_MBP', p: 'VIS_MBP', f: 'VIS_FV', v: 'VIS_FV', s: 'VIS_SZ', z: 'VIS_SZ',
+            '\u015f': 'VIS_SHCH', c: 'VIS_SHCH', '\u00e7': 'VIS_SHCH', j: 'VIS_SHCH', t: 'VIS_TDN', d: 'VIS_TDN', n: 'VIS_TDN',
+            k: 'VIS_KG', g: 'VIS_KG', '\u011f': 'VIS_KG', l: 'VIS_LR', r: 'VIS_LR'
+        };
+
+        let renderer;
+        let scene;
+        let camera;
+        let mixer;
+        let clock;
+        let morphMeshes = [];
+        let idleAction;
+        let speakingAction;
+        let activeSpeech = null;
+        let currentViseme = 'VIS_SIL';
+        let visemeStrength = 0;
+
+        function playCharacterAction(action, fade = 0.25) {
+            if (!action || action === window.characterAction) return;
+            const previous = window.characterAction;
+            action.reset().fadeIn(fade).play();
+            if (previous) previous.fadeOut(fade);
+            window.characterAction = action;
+        }
+
+        function setMorph(mesh, name, target, speed = 0.28) {
+            const index = mesh.morphTargetDictionary?.[name];
+            if (index === undefined) return;
+            mesh.morphTargetInfluences[index] = THREE.MathUtils.lerp(mesh.morphTargetInfluences[index] || 0, target, speed);
+        }
+
+        function visemeForText(text, progress) {
+            const letters = Array.from((text || '').toLocaleLowerCase('tr-TR'));
+            if (!letters.length) return 'VIS_A';
+            const index = Math.min(letters.length - 1, Math.floor(progress * letters.length));
+            for (let offset = 0; offset < 4; offset += 1) {
+                const letter = letters[Math.min(letters.length - 1, index + offset)];
+                if (LETTER_VISEMES[letter]) return LETTER_VISEMES[letter];
+            }
+            return 'VIS_SIL';
+        }
+
+        function updateLipSync() {
+            let nextViseme = 'VIS_SIL';
+            let strength = 0;
+            if (activeSpeech) {
+                const { audio, analyser, frequencyData, text, localSpeech } = activeSpeech;
+                const letterCount = Math.max(1, Array.from(text || '').length);
+                let progress = (((performance.now() - activeSpeech.startedAt) / 85) % letterCount) / letterCount;
+                if (audio && Number.isFinite(audio.duration) && audio.duration > 0) {
+                    progress = Math.min(0.999, audio.currentTime / audio.duration);
+                }
+                nextViseme = visemeForText(text, progress);
+                if (analyser) {
+                    analyser.getByteFrequencyData(frequencyData);
+                    const average = frequencyData.reduce((sum, value) => sum + value, 0) / Math.max(1, frequencyData.length);
+                    strength = THREE.MathUtils.clamp((average - 3) / 42, 0, 1);
+                } else if (localSpeech) {
+                    strength = 0.45 + Math.abs(Math.sin(performance.now() * 0.018)) * 0.5;
+                }
+            }
+            currentViseme = nextViseme;
+            visemeStrength = THREE.MathUtils.lerp(visemeStrength, strength, 0.35);
+            morphMeshes.forEach(mesh => {
+                VISEMES.forEach(name => setMorph(mesh, name, name === currentViseme ? visemeStrength : 0));
+                setMorph(mesh, 'Mouth_JawOpen', currentViseme === 'VIS_SIL' ? 0 : visemeStrength * 0.2);
+            });
+        }
+
+        function animateCharacter() {
+            requestAnimationFrame(animateCharacter);
+            const delta = Math.min(clock?.getDelta() || 0, 0.05);
+            if (mixer) mixer.update(delta);
+            updateLipSync();
+            renderer?.render(scene, camera);
+        }
+
+        window.initCharacterModel = function initCharacterModel() {
+            const canvas = document.getElementById('characterCanvas');
+            const stage = document.getElementById('characterStage');
+            if (!canvas || !stage || renderer) return;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+            renderer.setClearColor(0x000000, 0);
+            clock = new THREE.Clock();
+
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x45506a, 2.4));
+            const key = new THREE.DirectionalLight(0xffffff, 2.8);
+            key.position.set(3, 5, 5);
+            scene.add(key);
+
+            const resize = () => {
+                const width = Math.max(1, stage.clientWidth);
+                const height = Math.max(1, stage.clientHeight);
+                renderer.setSize(width, height, false);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            };
+            new ResizeObserver(resize).observe(stage);
+            resize();
+
+            new GLTFLoader().load(MODEL_URL, gltf => {
+                const modelRoot = gltf.scene;
+                scene.add(modelRoot);
+                modelRoot.traverse(object => {
+                    if (object.isMesh) {
+                        object.frustumCulled = false;
+                        if (object.morphTargetDictionary && object.morphTargetInfluences) morphMeshes.push(object);
+                    }
+                });
+
+                const box = new THREE.Box3().setFromObject(modelRoot);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+                modelRoot.position.sub(center);
+                modelRoot.position.y -= size.y * 0.03;
+                const distance = (size.y * 0.58) / Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
+                camera.position.set(0, size.y * 0.03, distance);
+                camera.lookAt(0, size.y * 0.03, 0);
+                camera.near = Math.max(0.01, distance - size.z * 2);
+                camera.far = distance + size.z * 4;
+                camera.updateProjectionMatrix();
+
+                mixer = new THREE.AnimationMixer(modelRoot);
+                const clips = Object.fromEntries(gltf.animations.map(clip => [clip.name, clip]));
+                if (clips.IDLE) idleAction = mixer.clipAction(clips.IDLE);
+                if (clips.SPEAKING) speakingAction = mixer.clipAction(clips.SPEAKING);
+                if (clips.BLINK) mixer.clipAction(clips.BLINK).setLoop(THREE.LoopRepeat, Infinity).play();
+                playCharacterAction(idleAction, 0);
+                stage.classList.add('is-ready');
+            }, undefined, error => {
+                stage.classList.add('has-error');
+                console.error('Karakter modeli yuklenemedi:', error);
+            });
+            animateCharacter();
+        };
+
+        window.startCharacterSpeech = function startCharacterSpeech(options = {}) {
+            activeSpeech = {
+                audio: options.audio || null,
+                analyser: options.analyser || null,
+                frequencyData: options.analyser ? new Uint8Array(options.analyser.frequencyBinCount) : null,
+                text: options.text || '',
+                localSpeech: Boolean(options.localSpeech),
+                startedAt: performance.now()
+            };
+            playCharacterAction(speakingAction);
+        };
+
+        window.stopCharacterSpeech = function stopCharacterSpeech() {
+            activeSpeech = null;
+            currentViseme = 'VIS_SIL';
+            visemeStrength = 0;
+            playCharacterAction(idleAction);
+        };
+    </script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 
@@ -171,6 +347,20 @@
         #idleScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         #appShell { display: none; }
         #appShell.active { display: block; }
+        .character-stage {
+            width: min(76vw, 460px); height: min(58vh, 520px); position: relative;
+            opacity: 0; transition: opacity 0.35s ease;
+            cursor: pointer; touch-action: manipulation;
+        }
+        .character-stage.is-ready { opacity: 1; }
+        .character-stage canvas { width: 100%; height: 100%; display: block; }
+        .character-stage::after {
+            content: 'Model y\00fckleniyor...'; position: absolute; inset: 0;
+            display: grid; place-items: center; color: var(--text-muted); font-size: 17px;
+        }
+        .character-stage.is-ready::after { display: none; }
+        .character-stage.has-error { opacity: 1; }
+        .character-stage.has-error::after { content: 'Karakter modeli y\00fcklenemedi'; }
         .line-face {
             width: min(52vw, 320px); aspect-ratio: 1; position: relative;
             border: 7px solid var(--text); border-radius: 50%;
@@ -497,14 +687,8 @@
 </head>
 <body>
     <section id="idleScreen" aria-label="KarÅŸÄ±lama ekranÄ±">
-        <div id="idleFace" class="line-face is-happy" aria-hidden="true" onclick="setIdleFace('petted', 2500)">
-            <div class="line-brow left"></div>
-            <div class="line-brow right"></div>
-            <div class="line-eye left"><span class="line-pupil"></span></div>
-            <div class="line-eye right"><span class="line-pupil"></span></div>
-            <div class="line-cheek left"></div>
-            <div class="line-cheek right"></div>
-            <div class="line-smile"></div>
+        <div id="characterStage" class="character-stage" role="img" aria-label="Data Koleji tanitim robotu" onclick="setIdleFace('petted', 2500)">
+            <canvas id="characterCanvas"></canvas>
         </div>
         <p class="idle-title">Ho&#351; Geldiniz</p>
         <p id="presenceStatus" class="presence-status" aria-live="polite"></p>
@@ -752,6 +936,7 @@
         let personModelFailed = false;
         let personDetectionBusy = false;
         let lastPersonDetectionAt = 0;
+        let robotAudioContext = null;
         let lastPiPresenceEventId = localStorage.getItem('robot_last_pi_presence_event') || '';
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
@@ -783,9 +968,25 @@
         }
 
         function setSpeakingFace(isSpeaking) {
-            const face = document.getElementById('idleFace');
-            if (!face) return;
-            face.classList.toggle('is-speaking', Boolean(isSpeaking));
+            if (!isSpeaking) window.stopCharacterSpeech?.();
+        }
+
+        function connectAudioToCharacter(audio, text) {
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return { analyser: null, text };
+                if (!robotAudioContext) robotAudioContext = new AudioContextClass();
+                if (robotAudioContext.state === 'suspended') robotAudioContext.resume().catch(() => {});
+                const source = robotAudioContext.createMediaElementSource(audio);
+                const analyser = robotAudioContext.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.58;
+                source.connect(analyser);
+                analyser.connect(robotAudioContext.destination);
+                return { analyser, text };
+            } catch (error) {
+                return { analyser: null, text };
+            }
         }
 
         function playRobotAudio(url, fallbackText = '') {
@@ -794,8 +995,15 @@
                 return null;
             }
             const audio = new Audio(url);
+            audio.crossOrigin = 'anonymous';
+            const characterAudio = connectAudioToCharacter(audio, fallbackText);
             audio.addEventListener('play', () => {
-                setSpeakingFace(true);
+                window.startCharacterSpeech?.({
+                    audio,
+                    analyser: characterAudio.analyser,
+                    text: fallbackText,
+                    localSpeech: !characterAudio.analyser
+                });
                 switchVideo('speaking');
             });
             audio.addEventListener('ended', () => {
@@ -986,7 +1194,7 @@
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'tr-TR';
             utterance.onstart = () => {
-                setSpeakingFace(true);
+                window.startCharacterSpeech?.({ text, localSpeech: true });
                 switchVideo('speaking');
             };
             utterance.onend = () => {
@@ -1161,6 +1369,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.getElementById('themeToggle');
                 if (btn) btn.textContent = 'Tema';
+                window.initCharacterModel?.();
                 showIdleScreen();
                 if (USE_BROWSER_CAMERA_PRESENCE) startPresenceCamera();
                 if (USE_PI_PRESENCE) {

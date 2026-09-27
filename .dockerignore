@@ -10,5 +10,6 @@ firebase.json
 .firebaserc
 FIREBASE_HOSTING.md
 public/
+*.glb
 test_*.py
 test_ui.html
