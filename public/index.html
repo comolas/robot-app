@@ -1097,6 +1097,13 @@
         let voiceRecordingStartedAt = 0;
         let voiceSpeechDetected = false;
         let voiceLastSpeechAt = 0;
+        let bargeInStream = null;
+        let bargeInContext = null;
+        let bargeInAnalyser = null;
+        let bargeInFrame = 0;
+        let bargeInStartedAt = 0;
+        let bargeInSpeechStartedAt = 0;
+        let bargeInNoiseFloor = 0;
         let lastPiPresenceEventId = localStorage.getItem('robot_last_pi_presence_event') || '';
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
@@ -1104,6 +1111,8 @@
         const VOICE_OUTPUT_SENSITIVITY = 1.65;
         const VOICE_INPUT_THRESHOLD = 0.055;
         const VOICE_SILENCE_TIMEOUT_MS = 1200;
+        const BARGE_IN_WARMUP_MS = 900;
+        const BARGE_IN_HOLD_MS = 220;
 
         function setVoiceState(state) {
             const visualizer = document.getElementById('voiceVisualizer');
@@ -1179,6 +1188,7 @@
         }
 
         function finishVoiceSpeaking() {
+            const reusableStream = stopBargeInMonitoring(true);
             const startingLevels = [...voiceOutputLevels];
             voiceOutputAnalyser = null;
             cancelAnimationFrame(voiceOutputFrame);
@@ -1192,10 +1202,91 @@
                     requestAnimationFrame(collapse);
                 } else {
                     setVoiceState('listening');
-                    setTimeout(beginVoiceListening, 120);
+                    setTimeout(() => beginVoiceListening(reusableStream), 120);
                 }
             };
             requestAnimationFrame(collapse);
+        }
+
+        function stopBargeInMonitoring(keepStream = false) {
+            cancelAnimationFrame(bargeInFrame);
+            bargeInFrame = 0;
+            bargeInAnalyser = null;
+            if (bargeInContext) bargeInContext.close().catch(() => {});
+            bargeInContext = null;
+            const stream = bargeInStream;
+            bargeInStream = null;
+            if (!keepStream && stream) stream.getTracks().forEach(track => track.stop());
+            return keepStream ? stream : null;
+        }
+
+        function updateBargeInLevel() {
+            if (!voiceConversationActive || !bargeInAnalyser || !currentVoiceAudio || currentVoiceAudio.paused) {
+                bargeInFrame = 0;
+                return;
+            }
+            const data = new Uint8Array(bargeInAnalyser.fftSize);
+            bargeInAnalyser.getByteTimeDomainData(data);
+            let energy = 0;
+            for (const sample of data) {
+                const normalized = (sample - 128) / 128;
+                energy += normalized * normalized;
+            }
+            const level = Math.min(1, Math.sqrt(energy / data.length) * 4.2);
+            const now = performance.now();
+            if (now - bargeInStartedAt < BARGE_IN_WARMUP_MS) {
+                bargeInNoiseFloor = bargeInNoiseFloor * 0.88 + level * 0.12;
+            } else {
+                const threshold = Math.max(0.09, bargeInNoiseFloor * 2.25);
+                if (level >= threshold) {
+                    if (!bargeInSpeechStartedAt) bargeInSpeechStartedAt = now;
+                    if (now - bargeInSpeechStartedAt >= BARGE_IN_HOLD_MS) {
+                        const stream = stopBargeInMonitoring(true);
+                        const interruptedAudio = currentVoiceAudio;
+                        currentVoiceAudio = null;
+                        if (interruptedAudio && !interruptedAudio.paused) interruptedAudio.pause();
+                        stopVoiceOutputAnalysis();
+                        setVoiceState('listening');
+                        beginVoiceListening(stream);
+                        return;
+                    }
+                } else {
+                    bargeInSpeechStartedAt = 0;
+                    bargeInNoiseFloor = bargeInNoiseFloor * 0.97 + level * 0.03;
+                }
+            }
+            bargeInFrame = requestAnimationFrame(updateBargeInLevel);
+        }
+
+        async function startBargeInMonitoring() {
+            stopBargeInMonitoring();
+            if (!voiceConversationActive || !navigator.mediaDevices?.getUserMedia) return;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                });
+                if (!voiceConversationActive || !currentVoiceAudio || currentVoiceAudio.paused) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+                bargeInStream = stream;
+                bargeInContext = new AudioContextClass();
+                bargeInAnalyser = bargeInContext.createAnalyser();
+                bargeInAnalyser.fftSize = 256;
+                bargeInAnalyser.smoothingTimeConstant = 0.72;
+                bargeInContext.createMediaStreamSource(stream).connect(bargeInAnalyser);
+                bargeInStartedAt = performance.now();
+                bargeInSpeechStartedAt = 0;
+                bargeInNoiseFloor = 0;
+                updateBargeInLevel();
+            } catch (error) {
+                stopBargeInMonitoring();
+            }
         }
 
         function toggleVoiceMenu() {
@@ -1224,6 +1315,7 @@
         function closeVoiceAssistant() {
             voiceConversationActive = false;
             discardVoiceRecording = true;
+            stopBargeInMonitoring();
             if (currentVoiceAudio && !currentVoiceAudio.paused) currentVoiceAudio.pause();
             currentVoiceAudio = null;
             if (window.speechSynthesis?.speaking) window.speechSynthesis.cancel();
@@ -1317,6 +1409,7 @@
                     currentVoiceAudio = audio;
                     setVoiceState('speaking');
                     startVoiceOutputAnalysis(playbackAudio.analyser);
+                    startBargeInMonitoring();
                 }
                 switchVideo('speaking');
             });
@@ -1327,12 +1420,12 @@
                 switchVideo('default');
             });
             audio.addEventListener('pause', () => {
-                setSpeakingFace(false);
+                if (!voiceConversationActive) setSpeakingFace(false);
                 if (voiceConversationActive && !audio.ended) stopVoiceOutputAnalysis();
                 switchVideo('default');
             });
             audio.addEventListener('error', () => {
-                setSpeakingFace(false);
+                if (!voiceConversationActive) setSpeakingFace(false);
                 stopVoiceOutputAnalysis();
                 switchVideo('default');
                 speakLocalGreeting(fallbackText);
@@ -1868,13 +1961,16 @@
             }
         }
 
-        async function beginVoiceListening() {
-            if (!voiceConversationActive || document.hidden || voiceRecorder?.state === 'recording') return;
+        async function beginVoiceListening(existingStream = null) {
+            if (!voiceConversationActive || document.hidden || voiceRecorder?.state === 'recording') {
+                if (existingStream) existingStream.getTracks().forEach(track => track.stop());
+                return;
+            }
             setVoiceState('listening');
-            await toggleVoiceInput();
+            await toggleVoiceInput(existingStream);
         }
 
-        async function toggleVoiceInput() {
+        async function toggleVoiceInput(existingStream = null) {
             if (voiceRecorder && voiceRecorder.state === 'recording') {
                 try { voiceRecorder.requestData(); } catch (e) {}
                 voiceRecorder.stop();
@@ -1882,7 +1978,7 @@
             }
             try {
                 const requestedByConversation = voiceConversationActive;
-                const stream = await navigator.mediaDevices.getUserMedia({
+                const stream = existingStream || await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
