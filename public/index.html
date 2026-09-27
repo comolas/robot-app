@@ -40,6 +40,8 @@
         let morphMeshes = [];
         let idleAction;
         let speakingAction;
+        let blinkAction;
+        let nextBlinkAt = performance.now() + 3500;
         let activeSpeech = null;
         let currentViseme = 'VIS_SIL';
         let visemeStrength = 0;
@@ -93,13 +95,25 @@
             morphMeshes.forEach(mesh => {
                 VISEMES.forEach(name => setMorph(mesh, name, name === currentViseme ? visemeStrength : 0));
                 setMorph(mesh, 'Mouth_JawOpen', currentViseme === 'VIS_SIL' ? 0 : visemeStrength * 0.2);
+                setMorph(mesh, 'SMILE', 0.22, 0.12);
+                setMorph(mesh, 'MOUTH_SMILE', 0.18, 0.12);
+                setMorph(mesh, 'Mouth_Smile', 0.18, 0.12);
+                setMorph(mesh, 'BROW_UP_LEFT', 0.06, 0.1);
+                setMorph(mesh, 'BROW_UP_RIGHT', 0.06, 0.1);
             });
+        }
+
+        function updateBlink() {
+            if (!blinkAction || performance.now() < nextBlinkAt) return;
+            blinkAction.reset().setLoop(THREE.LoopOnce, 1).play();
+            nextBlinkAt = performance.now() + 4200 + Math.random() * 3200;
         }
 
         function animateCharacter() {
             requestAnimationFrame(animateCharacter);
             const delta = Math.min(clock?.getDelta() || 0, 0.05);
             if (mixer) mixer.update(delta);
+            updateBlink();
             updateLipSync();
             renderer?.render(scene, camera);
         }
@@ -158,7 +172,10 @@
                 const clips = Object.fromEntries(gltf.animations.map(clip => [clip.name, clip]));
                 if (clips.IDLE) idleAction = mixer.clipAction(clips.IDLE);
                 if (clips.SPEAKING) speakingAction = mixer.clipAction(clips.SPEAKING);
-                if (clips.BLINK) mixer.clipAction(clips.BLINK).setLoop(THREE.LoopRepeat, Infinity).play();
+                if (clips.BLINK) {
+                    blinkAction = mixer.clipAction(clips.BLINK);
+                    blinkAction.clampWhenFinished = false;
+                }
                 playCharacterAction(idleAction, 0);
                 stage.classList.add('is-ready');
             }, undefined, error => {
