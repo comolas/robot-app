@@ -403,6 +403,73 @@
         #idleScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         #appShell { display: none; }
         #appShell.active { display: block; }
+        #voiceAssistantOverlay {
+            position: fixed; inset: 0; z-index: 2100; display: none;
+            background: #000; color: #fff; overflow: hidden;
+        }
+        #voiceAssistantOverlay.active { display: block; }
+        .voice-menu-button {
+            position: absolute; top: max(18px, env(safe-area-inset-top)); left: max(18px, env(safe-area-inset-left));
+            z-index: 3; width: 48px; height: 48px; padding: 0; border: 1px solid #383838;
+            border-radius: 6px; background: #111; color: #fff; cursor: pointer;
+            display: grid; place-content: center; gap: 5px;
+        }
+        .voice-menu-button span { width: 22px; height: 2px; border-radius: 2px; background: currentColor; }
+        .voice-menu-button:focus-visible, .voice-home-button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+        .voice-menu-panel {
+            position: absolute; inset: 0 auto 0 0; z-index: 2; width: min(78vw, 300px);
+            padding: 90px 18px 24px; background: #0b0b0b; border-right: 1px solid #292929;
+            transform: translateX(-102%); transition: transform 260ms ease;
+        }
+        .voice-menu-panel.open { transform: translateX(0); }
+        .voice-home-button {
+            width: 100%; min-height: 50px; border: 1px solid #343434; border-radius: 6px;
+            background: #171717; color: #fff; font: 600 18px 'EB Garamond', serif;
+            cursor: pointer; text-align: left; padding: 12px 16px;
+        }
+        .voice-assistant-center {
+            position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+        }
+        .voice-visualizer { position: relative; width: clamp(150px, 32vw, 230px); height: clamp(110px, 24vw, 170px); }
+        .voice-bubble, .voice-wave {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            transition: opacity 340ms ease, transform 340ms ease;
+        }
+        .voice-bubble-shape {
+            position: relative; width: clamp(92px, 20vw, 138px); height: clamp(66px, 14vw, 96px);
+            border-radius: 46% 46% 48% 48%; background: #fff;
+            transform: scale(var(--voice-input-scale, 1));
+        }
+        .voice-bubble-shape::after {
+            content: ''; position: absolute; left: 18%; bottom: -13px;
+            width: 28px; height: 28px; background: #fff; transform: skewY(-28deg) rotate(18deg);
+            border-radius: 3px 0 6px 4px;
+        }
+        .voice-thinking-dots { display: none; position: absolute; z-index: 1; gap: 8px; }
+        .voice-thinking-dots i { width: 8px; height: 8px; border-radius: 50%; background: #000; animation: voiceDot 1.15s ease-in-out infinite; }
+        .voice-thinking-dots i:nth-child(2) { animation-delay: 140ms; }
+        .voice-thinking-dots i:nth-child(3) { animation-delay: 280ms; }
+        .voice-wave { gap: clamp(5px, 1.2vw, 8px); opacity: 0; transform: scale(0.86); }
+        .voice-wave-bar {
+            width: clamp(7px, 1.5vw, 10px); height: 8px; border-radius: 999px; background: #fff;
+            will-change: height; transition: height 70ms linear;
+        }
+        .voice-visualizer[data-state='listening'] .voice-bubble-shape { animation: voiceBreathe 3.2s ease-in-out infinite; }
+        .voice-visualizer[data-state='thinking'] .voice-thinking-dots { display: flex; }
+        .voice-visualizer[data-state='thinking'] .voice-bubble-shape { animation: voiceThink 1.8s ease-in-out infinite; }
+        .voice-visualizer[data-state='speaking'] .voice-bubble { opacity: 0; transform: scale(0.82); }
+        .voice-visualizer[data-state='speaking'] .voice-wave { opacity: 1; transform: scale(1); }
+        .voice-state-label {
+            position: absolute; left: 24px; right: 24px; bottom: max(30px, env(safe-area-inset-bottom));
+            margin: 0; text-align: center; color: #bdbdbd; font-size: clamp(17px, 3vw, 21px);
+        }
+        @keyframes voiceBreathe { 0%, 100% { transform: scale(0.97); } 50% { transform: scale(1.03); } }
+        @keyframes voiceThink { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.045); } }
+        @keyframes voiceDot { 0%, 70%, 100% { transform: translateY(0); opacity: 0.35; } 35% { transform: translateY(-5px); opacity: 1; } }
+        @media (prefers-reduced-motion: reduce) {
+            .voice-bubble-shape, .voice-thinking-dots i { animation: none !important; }
+            .voice-bubble, .voice-wave, .voice-menu-panel { transition-duration: 1ms; }
+        }
         .character-stage {
             width: min(76vw, 460px); height: min(58vh, 520px); position: relative;
             opacity: 0; transition: opacity 0.35s ease;
@@ -746,6 +813,28 @@
     </style>
 </head>
 <body>
+    <section id="voiceAssistantOverlay" aria-hidden="true" aria-label="Sesli asistan">
+        <button class="voice-menu-button" type="button" aria-label="Menüyü aç" aria-expanded="false" onclick="toggleVoiceMenu()">
+            <span></span><span></span><span></span>
+        </button>
+        <nav id="voiceMenuPanel" class="voice-menu-panel" aria-label="Sesli asistan menüsü">
+            <button class="voice-home-button" type="button" onclick="openMainInterface()">&#8962;&nbsp;&nbsp;Ana Sayfa</button>
+        </nav>
+        <div class="voice-assistant-center">
+            <div id="voiceVisualizer" class="voice-visualizer" data-state="listening" aria-hidden="true">
+                <div class="voice-bubble">
+                    <div class="voice-bubble-shape"></div>
+                    <span class="voice-thinking-dots"><i></i><i></i><i></i></span>
+                </div>
+                <div id="voiceWave" class="voice-wave">
+                    <i class="voice-wave-bar"></i><i class="voice-wave-bar"></i><i class="voice-wave-bar"></i>
+                    <i class="voice-wave-bar"></i><i class="voice-wave-bar"></i><i class="voice-wave-bar"></i>
+                    <i class="voice-wave-bar"></i><i class="voice-wave-bar"></i><i class="voice-wave-bar"></i>
+                </div>
+            </div>
+        </div>
+        <p id="voiceStateLabel" class="voice-state-label" aria-live="polite">Dinliyorum...</p>
+    </section>
     <section id="idleScreen" aria-label="KarÅŸÄ±lama ekranÄ±">
         <div id="idleCharacterHost" class="character-host">
             <div id="characterStage" class="character-stage" role="img" aria-label="Data Koleji tanitim robotu" onclick="setIdleFace('petted', 2500)">
@@ -997,9 +1086,161 @@
         let personDetectionBusy = false;
         let lastPersonDetectionAt = 0;
         let robotAudioContext = null;
+        let voiceConversationActive = false;
+        let voiceInputContext = null;
+        let voiceInputAnalyser = null;
+        let voiceInputFrame = 0;
+        let voiceOutputAnalyser = null;
+        let voiceOutputFrame = 0;
+        let voiceOutputLevels = Array(9).fill(0);
+        let currentVoiceAudio = null;
+        let voiceRecordingStartedAt = 0;
+        let voiceSpeechDetected = false;
+        let voiceLastSpeechAt = 0;
         let lastPiPresenceEventId = localStorage.getItem('robot_last_pi_presence_event') || '';
         let SESSION_ID = localStorage.getItem(SESSION_ID_KEY) || createSessionId();
         localStorage.setItem(SESSION_ID_KEY, SESSION_ID);
+
+        const VOICE_OUTPUT_SENSITIVITY = 1.65;
+        const VOICE_INPUT_THRESHOLD = 0.055;
+        const VOICE_SILENCE_TIMEOUT_MS = 1200;
+
+        function setVoiceState(state) {
+            const visualizer = document.getElementById('voiceVisualizer');
+            const label = document.getElementById('voiceStateLabel');
+            if (visualizer) visualizer.dataset.state = state;
+            if (label) {
+                label.textContent = {
+                    listening: 'Dinliyorum...',
+                    thinking: 'Düşünüyorum...',
+                    speaking: 'Konuşuyorum...'
+                }[state] || '';
+            }
+            if (state !== 'speaking') setOutputLevel(0);
+            if (voiceConversationActive) resetIdleTimer();
+        }
+
+        function setInputLevel(value) {
+            const bubble = document.querySelector('.voice-bubble-shape');
+            if (!bubble) return;
+            const level = Math.max(0, Math.min(1, Number(value) || 0));
+            bubble.style.scale = String(1 + level * 0.025);
+        }
+
+        function setOutputLevel(value) {
+            const level = Math.max(0, Math.min(1, Number(value) || 0));
+            const factors = [0.5, 0.68, 0.88, 1.04, 1.16, 1.04, 0.88, 0.68, 0.5];
+            setOutputBands(factors.map(factor => Math.min(1, level * factor)));
+        }
+
+        function setOutputBands(levels) {
+            const bars = document.querySelectorAll('.voice-wave-bar');
+            bars.forEach((bar, index) => {
+                const target = Math.max(0, Math.min(1, levels[index] || 0));
+                voiceOutputLevels[index] += (target - voiceOutputLevels[index]) * 0.32;
+                bar.style.height = `${8 + voiceOutputLevels[index] * 60}px`;
+            });
+        }
+
+        window.setVoiceState = setVoiceState;
+        window.setInputLevel = setInputLevel;
+        window.setOutputLevel = setOutputLevel;
+
+        function updateVoiceOutput() {
+            if (!voiceConversationActive || document.hidden || !voiceOutputAnalyser) {
+                voiceOutputFrame = 0;
+                return;
+            }
+            const data = new Uint8Array(voiceOutputAnalyser.frequencyBinCount);
+            voiceOutputAnalyser.getByteFrequencyData(data);
+            const bands = Array.from({ length: 9 }, (_, index) => {
+                const start = Math.floor(index * data.length * 0.075);
+                const end = Math.max(start + 1, Math.floor((index + 1) * data.length * 0.075));
+                let total = 0;
+                for (let i = start; i < end; i += 1) total += data[i];
+                return Math.min(1, (total / (end - start) / 255) * VOICE_OUTPUT_SENSITIVITY);
+            });
+            setOutputBands(bands);
+            voiceOutputFrame = requestAnimationFrame(updateVoiceOutput);
+        }
+
+        function startVoiceOutputAnalysis(analyser) {
+            voiceOutputAnalyser = analyser;
+            cancelAnimationFrame(voiceOutputFrame);
+            voiceOutputFrame = 0;
+            if (analyser && voiceConversationActive && !document.hidden) updateVoiceOutput();
+        }
+
+        function stopVoiceOutputAnalysis() {
+            voiceOutputAnalyser = null;
+            cancelAnimationFrame(voiceOutputFrame);
+            voiceOutputFrame = 0;
+            setOutputLevel(0);
+        }
+
+        function finishVoiceSpeaking() {
+            const startingLevels = [...voiceOutputLevels];
+            voiceOutputAnalyser = null;
+            cancelAnimationFrame(voiceOutputFrame);
+            voiceOutputFrame = 0;
+            const startedAt = performance.now();
+            const collapse = now => {
+                if (!voiceConversationActive) return;
+                const progress = Math.min(1, (now - startedAt) / 340);
+                setOutputBands(startingLevels.map(level => level * (1 - progress)));
+                if (progress < 1 && !document.hidden) {
+                    requestAnimationFrame(collapse);
+                } else {
+                    setVoiceState('listening');
+                    setTimeout(beginVoiceListening, 120);
+                }
+            };
+            requestAnimationFrame(collapse);
+        }
+
+        function toggleVoiceMenu() {
+            const panel = document.getElementById('voiceMenuPanel');
+            const button = document.querySelector('.voice-menu-button');
+            const open = panel?.classList.toggle('open') || false;
+            if (button) {
+                button.setAttribute('aria-expanded', String(open));
+                button.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
+            }
+        }
+
+        function closeVoiceMenu() {
+            document.getElementById('voiceMenuPanel')?.classList.remove('open');
+            const button = document.querySelector('.voice-menu-button');
+            if (button) button.setAttribute('aria-expanded', 'false');
+        }
+
+        function stopVoiceRecording() {
+            if (voiceRecorder?.state === 'recording') {
+                try { voiceRecorder.requestData(); } catch (e) {}
+                voiceRecorder.stop();
+            }
+        }
+
+        function closeVoiceAssistant() {
+            voiceConversationActive = false;
+            discardVoiceRecording = true;
+            if (currentVoiceAudio && !currentVoiceAudio.paused) currentVoiceAudio.pause();
+            currentVoiceAudio = null;
+            if (window.speechSynthesis?.speaking) window.speechSynthesis.cancel();
+            stopVoiceOutputAnalysis();
+            stopVoiceRecording();
+            closeVoiceMenu();
+            const overlay = document.getElementById('voiceAssistantOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        function openMainInterface() {
+            closeVoiceAssistant();
+            showQuickCardsScreen();
+        }
 
         function createSessionId() {
             if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -1037,7 +1278,7 @@
             if (!isSpeaking) window.stopCharacterSpeech?.();
         }
 
-        function connectAudioToCharacter(audio, text) {
+        function connectAudioForPlayback(audio, text) {
             try {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContextClass) return { analyser: null, text };
@@ -1062,26 +1303,37 @@
             }
             const audio = new Audio(url);
             audio.crossOrigin = 'anonymous';
-            const characterAudio = connectAudioToCharacter(audio, fallbackText);
+            const playbackAudio = connectAudioForPlayback(audio, fallbackText);
             audio.addEventListener('play', () => {
-                window.startCharacterSpeech?.({
-                    audio,
-                    analyser: characterAudio.analyser,
-                    text: fallbackText,
-                    localSpeech: !characterAudio.analyser
-                });
+                if (!voiceConversationActive) {
+                    window.startCharacterSpeech?.({
+                        audio,
+                        analyser: playbackAudio.analyser,
+                        text: fallbackText,
+                        localSpeech: !playbackAudio.analyser
+                    });
+                }
+                if (voiceConversationActive) {
+                    currentVoiceAudio = audio;
+                    setVoiceState('speaking');
+                    startVoiceOutputAnalysis(playbackAudio.analyser);
+                }
                 switchVideo('speaking');
             });
             audio.addEventListener('ended', () => {
-                setSpeakingFace(false);
+                if (!voiceConversationActive) setSpeakingFace(false);
+                if (currentVoiceAudio === audio) currentVoiceAudio = null;
+                if (voiceConversationActive) finishVoiceSpeaking();
                 switchVideo('default');
             });
             audio.addEventListener('pause', () => {
                 setSpeakingFace(false);
+                if (voiceConversationActive && !audio.ended) stopVoiceOutputAnalysis();
                 switchVideo('default');
             });
             audio.addEventListener('error', () => {
                 setSpeakingFace(false);
+                stopVoiceOutputAnalysis();
                 switchVideo('default');
                 speakLocalGreeting(fallbackText);
             });
@@ -1260,15 +1512,18 @@
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'tr-TR';
             utterance.onstart = () => {
-                window.startCharacterSpeech?.({ text, localSpeech: true });
+                if (!voiceConversationActive) window.startCharacterSpeech?.({ text, localSpeech: true });
+                if (voiceConversationActive) setVoiceState('speaking');
                 switchVideo('speaking');
             };
             utterance.onend = () => {
-                setSpeakingFace(false);
+                if (!voiceConversationActive) setSpeakingFace(false);
+                if (voiceConversationActive) finishVoiceSpeaking();
                 switchVideo('default');
             };
             utterance.onerror = () => {
-                setSpeakingFace(false);
+                if (!voiceConversationActive) setSpeakingFace(false);
+                if (voiceConversationActive) finishVoiceSpeaking();
                 switchVideo('default');
             };
             window.speechSynthesis.cancel();
@@ -1364,6 +1619,7 @@
 
         function showQuickCardsScreen() {
             appIsOpen = true;
+            closeVoiceAssistant();
             resetIdleTimer();
             clearActiveOutputs();
             moveCharacterTo('welcomeCharacterHost');
@@ -1382,6 +1638,7 @@
 
         function showIdleScreen() {
             appIsOpen = false;
+            closeVoiceAssistant();
             clearTimeout(idleTimer);
             resetSession();
             clearActiveOutputs();
@@ -1398,15 +1655,22 @@
 
         async function openApp() {
             appIsOpen = true;
+            voiceConversationActive = true;
             requestFullscreenMode();
-            moveCharacterTo('welcomeCharacterHost');
             const idle = document.getElementById('idleScreen');
             const shell = document.getElementById('appShell');
             if (idle) idle.classList.add('hidden');
             if (shell) {
-                shell.classList.add('active');
-                shell.setAttribute('aria-hidden', 'false');
+                shell.classList.remove('active');
+                shell.setAttribute('aria-hidden', 'true');
             }
+            const overlay = document.getElementById('voiceAssistantOverlay');
+            if (overlay) {
+                overlay.classList.add('active');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+            closeVoiceMenu();
+            setVoiceState('thinking');
             resetIdleTimer();
             try {
                 const response = await fetch(`${API}/session/start`, {
@@ -1415,10 +1679,16 @@
                     body: JSON.stringify({ session_id: SESSION_ID })
                 });
                 const data = await response.json();
-                if (data.audio_path) playRobotAudio(`${API}${data.audio_path}`, data.answer || '');
-            } catch (e) {}
-            const q = document.getElementById('question');
-            if (q) q.focus();
+                if (data.audio_path) {
+                    playRobotAudio(`${API}${data.audio_path}`, data.answer || '');
+                } else {
+                    setVoiceState('listening');
+                    beginVoiceListening();
+                }
+            } catch (e) {
+                setVoiceState('listening');
+                beginVoiceListening();
+            }
         }
 
         // â”€â”€ TEMA YÃ–NETÄ°MÄ° â”€â”€
@@ -1538,6 +1808,71 @@
 
         // â”€â”€ SESLÄ° KOMUT â”€â”€
         let voiceRecorder = null, voiceChunks = [];
+        let voiceStream = null;
+        let discardVoiceRecording = false;
+
+        function stopVoiceInputAnalysis() {
+            cancelAnimationFrame(voiceInputFrame);
+            voiceInputFrame = 0;
+            voiceInputAnalyser = null;
+            if (voiceInputContext) voiceInputContext.close().catch(() => {});
+            voiceInputContext = null;
+            setInputLevel(0);
+        }
+
+        function updateVoiceInput() {
+            if (!voiceInputAnalyser || !voiceRecorder || voiceRecorder.state !== 'recording') {
+                voiceInputFrame = 0;
+                return;
+            }
+            if (!document.hidden) {
+                const data = new Uint8Array(voiceInputAnalyser.fftSize);
+                voiceInputAnalyser.getByteTimeDomainData(data);
+                let energy = 0;
+                for (const sample of data) {
+                    const normalized = (sample - 128) / 128;
+                    energy += normalized * normalized;
+                }
+                const level = Math.min(1, Math.sqrt(energy / data.length) * 4.2);
+                setInputLevel(level);
+                const now = performance.now();
+                if (level >= VOICE_INPUT_THRESHOLD) {
+                    voiceSpeechDetected = true;
+                    voiceLastSpeechAt = now;
+                }
+                if (
+                    voiceConversationActive &&
+                    voiceSpeechDetected &&
+                    now - voiceLastSpeechAt >= VOICE_SILENCE_TIMEOUT_MS &&
+                    now - voiceRecordingStartedAt >= 1000
+                ) {
+                    stopVoiceRecording();
+                    return;
+                }
+            }
+            voiceInputFrame = requestAnimationFrame(updateVoiceInput);
+        }
+
+        function attachVoiceInputAnalysis(stream) {
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                voiceInputContext = new AudioContextClass();
+                voiceInputAnalyser = voiceInputContext.createAnalyser();
+                voiceInputAnalyser.fftSize = 256;
+                voiceInputAnalyser.smoothingTimeConstant = 0.7;
+                voiceInputContext.createMediaStreamSource(stream).connect(voiceInputAnalyser);
+                updateVoiceInput();
+            } catch (error) {
+                stopVoiceInputAnalysis();
+            }
+        }
+
+        async function beginVoiceListening() {
+            if (!voiceConversationActive || document.hidden || voiceRecorder?.state === 'recording') return;
+            setVoiceState('listening');
+            await toggleVoiceInput();
+        }
 
         async function toggleVoiceInput() {
             if (voiceRecorder && voiceRecorder.state === 'recording') {
@@ -1546,6 +1881,7 @@
                 return;
             }
             try {
+                const requestedByConversation = voiceConversationActive;
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: true,
@@ -1553,7 +1889,16 @@
                         autoGainControl: true
                     }
                 });
+                if (requestedByConversation && !voiceConversationActive) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+                voiceStream = stream;
                 voiceChunks = [];
+                discardVoiceRecording = false;
+                voiceSpeechDetected = false;
+                voiceLastSpeechAt = 0;
+                voiceRecordingStartedAt = performance.now();
                 const mimeType = getSupportedAudioMimeType();
                 voiceRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
                 voiceRecorder.ondataavailable = e => {
@@ -1561,13 +1906,23 @@
                 };
                 voiceRecorder.onstop = async () => {
                     stream.getTracks().forEach(t => t.stop());
+                    voiceStream = null;
+                    stopVoiceInputAnalysis();
                     document.getElementById('voiceBtn').textContent = 'Mikrofon';
                     document.getElementById('voiceStatus').style.display = 'none';
                     switchVideo('default');
+                    if (discardVoiceRecording) {
+                        discardVoiceRecording = false;
+                        voiceChunks = [];
+                        return;
+                    }
                     const blob = new Blob(voiceChunks, { type: voiceRecorder.mimeType || mimeType || 'audio/webm' });
+                    if (voiceConversationActive) setVoiceState('thinking');
                     await sendVoiceCommand(blob);
                 };
                 voiceRecorder.start(250);
+                const activeRecorder = voiceRecorder;
+                attachVoiceInputAnalysis(stream);
                 document.getElementById('voiceBtn').textContent = 'Durdur';
                 document.getElementById('voiceStatus').style.display = 'block';
                 document.getElementById('welcomeBox').style.display = 'none';
@@ -1575,12 +1930,20 @@
                 setMood('listening', 'Dinliyorum...');
                 switchVideo('listening');
                 setTimeout(() => {
-                    if (voiceRecorder && voiceRecorder.state === 'recording') {
-                        try { voiceRecorder.requestData(); } catch (e) {}
-                        voiceRecorder.stop();
+                    if (activeRecorder.state === 'recording') {
+                        try { activeRecorder.requestData(); } catch (e) {}
+                        activeRecorder.stop();
                     }
                 }, 15000);
-            } catch(e) { alert('Mikrofon eriÅŸimi reddedildi.'); }
+            } catch(e) {
+                if (voiceConversationActive) {
+                    setVoiceState('listening');
+                    const label = document.getElementById('voiceStateLabel');
+                    if (label) label.textContent = 'Mikrofon izni gerekli';
+                } else {
+                    alert('Mikrofon eriÅŸimi reddedildi.');
+                }
+            }
         }
 
         async function sendVoiceCommand(blob) {
@@ -1590,6 +1953,7 @@
 
             if (!blob || blob.size < 1200) {
                 answerDiv.innerHTML = '<p style="color:red;">Ses kaydÄ± Ã§ok kÄ±sa veya boÅŸ gÃ¶rÃ¼nÃ¼yor. LÃ¼tfen butona bastÄ±ktan sonra 1-2 saniye bekleyip konuÅŸun.</p>';
+                if (voiceConversationActive) setTimeout(beginVoiceListening, 700);
                 return;
             }
 
@@ -1601,6 +1965,7 @@
                 const data = await r.json();
                 if (data.error || !data.transcript) {
                     answerDiv.innerHTML = `<p style="color:red;">${data.error || 'Ses anlaÅŸÄ±lamadÄ±.'}</p>`;
+                    if (voiceConversationActive) setTimeout(beginVoiceListening, 900);
                     return;
                 }
                 // TanÄ±nan metni input'a yaz ve soruyu gÃ¶nder
@@ -1609,6 +1974,7 @@
                 await askQuestion();
             } catch(e) {
                 answerDiv.innerHTML = '<p style="color:red;">Ses komutu gÃ¶nderilemedi.</p>';
+                if (voiceConversationActive) setTimeout(beginVoiceListening, 900);
             }
         }
 
@@ -1654,6 +2020,7 @@
             const question = document.getElementById('question').value;
             const answerDiv = document.getElementById('answer');
             if (!question) return;
+            if (voiceConversationActive) setVoiceState('thinking');
             reactToPositiveFeedback(question);
 
             answerDiv.style.display = 'block';
@@ -1682,6 +2049,10 @@
                 if (data.answer === '__GALLERY__') {
                     setMood('happy', 'Galeri yÃ¼kleniyor!');
                     await showGallery(answerDiv);
+                    if (voiceConversationActive) {
+                        openMainInterface();
+                        answerDiv.style.display = 'block';
+                    }
                     return;
                 }
 
@@ -1729,12 +2100,16 @@
                     document.getElementById('faceBar').style.display = 'none';
                 }
 
-                if (data.audio_path && !explicitPdfPage) {
+                if (data.audio_path && (!explicitPdfPage || voiceConversationActive)) {
                     setMood('speaking', 'KonuÅŸuyor...');
                     const audio = playRobotAudio(`${API}${data.audio_path}`, data.answer || '');
                     audio.onended = () => setMood('happy', '');
                 } else if (!isPdf) {
                     setMood('happy', '');
+                    if (voiceConversationActive) {
+                        setVoiceState('listening');
+                        setTimeout(beginVoiceListening, 500);
+                    }
                 }
 
                 // Sayfa metnini kaydet (PDF ise)
@@ -1797,6 +2172,10 @@
             } catch (error) {
                 setMood('surprised', 'Bir hata oluÅŸtu!');
                 answerDiv.innerHTML = '<p style="color:red;">Hata: API Ã§alÄ±ÅŸmÄ±yor olabilir.</p>';
+                if (voiceConversationActive) {
+                    setVoiceState('listening');
+                    setTimeout(beginVoiceListening, 900);
+                }
             }
         }
 
