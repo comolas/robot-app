@@ -385,6 +385,7 @@ async def head_touch(req: SessionStart):
 async def ask_question(question: Question):
     """Arduino'dan gelen soruyu yanıtla"""
     global rag_engine
+    request_started_at = time.perf_counter()
     session = get_session(question.session_id)
     session["last_seen"] = time.time()
 
@@ -513,9 +514,11 @@ async def ask_question(question: Question):
                 return Answer(answer=f"Bu sayfayı işlerken bir sorun oluştu: {e}", audio_path="")
 
         # Personel / ogretmen / zumre sorularinda once kesin metin eslesmesi dene
+        rag_started_at = time.perf_counter()
         answer = rag_engine.answer_staff_question(question.question)
         if not answer:
             answer = rag_engine.ask(question.question)
+        rag_elapsed = time.perf_counter() - rag_started_at
         if session.get("introduced"):
             answer = remove_repeated_intro(answer)
         else:
@@ -523,9 +526,13 @@ async def ask_question(question: Question):
         answer = add_name_to_answer(answer, user_name)
         
         audio_path = ""
+        tts_started_at = time.perf_counter()
         if tts_service:
             cached_path = tts_service.text_to_speech(truncate_for_tts(clean_spoken_markdown(answer)))
             audio_path = f"/audio/{Path(cached_path).name}"
+        tts_elapsed = time.perf_counter() - tts_started_at
+        total_elapsed = time.perf_counter() - request_started_at
+        print(f"TIMING ask rag={rag_elapsed:.2f}s tts={tts_elapsed:.2f}s total={total_elapsed:.2f}s")
         
         return Answer(answer=answer, audio_path=audio_path, session_id=question.session_id, user_name=user_name)
     
@@ -809,8 +816,9 @@ async def generate_simulation(req: SimulationRequest):
     return result
 
 @app.post("/voice-ask")
-async def voice_ask(audio: UploadFile = File(...)):
+async def voice_ask(audio: UploadFile = File(...), session_id: str = Form("default")):
     """Sesli komut: ses -> metin -> cevap"""
+    voice_started_at = time.perf_counter()
     audio_dir = Path("audio_output")
     audio_dir.mkdir(exist_ok=True)
     ext = Path(audio.filename or "").suffix.lower()
@@ -852,7 +860,12 @@ async def voice_ask(audio: UploadFile = File(...)):
         print(f"STT failed for {temp_path.name}: {detail}")
         return {"transcript": "", "error": "Ses anlaşılamadı. Lütfen mikrofona biraz daha yakın ve net konuşarak tekrar deneyin.", "debug": detail}
 
-    return {"transcript": transcript, "debug": stt_debug}
+    stt_elapsed = time.perf_counter() - voice_started_at
+    answer = await ask_question(Question(question=transcript, session_id=session_id))
+    answer_payload = answer.model_dump() if hasattr(answer, "model_dump") else answer.dict()
+    total_elapsed = time.perf_counter() - voice_started_at
+    print(f"TIMING voice stt={stt_elapsed:.2f}s total={total_elapsed:.2f}s")
+    return {"transcript": transcript, "response": answer_payload, "debug": stt_debug}
 
 @app.get("/")
 async def root():

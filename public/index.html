@@ -2055,6 +2055,7 @@
 
             const fd = new FormData();
             fd.append('audio', blob, audioFileNameForMime(blob.type || 'audio/webm'));
+            fd.append('session_id', SESSION_ID);
 
             try {
                 const r = await fetch(`${API}/voice-ask`, { method: 'POST', body: fd });
@@ -2067,7 +2068,7 @@
                 // TanÄ±nan metni input'a yaz ve soruyu gÃ¶nder
                 document.getElementById('question').value = data.transcript;
                 answerDiv.innerHTML = SKL.answer;
-                await askQuestion();
+                await askQuestion(data.response || null);
             } catch(e) {
                 answerDiv.innerHTML = '<p style="color:red;">Ses komutu gÃ¶nderilemedi.</p>';
                 if (voiceConversationActive) setTimeout(beginVoiceListening, 900);
@@ -2112,7 +2113,7 @@
         loadLessons();
 
         // â”€â”€ SORU-CEVAP â”€â”€
-        async function askQuestion() {
+        async function askQuestion(prefetchedData = null) {
             const question = document.getElementById('question').value;
             const answerDiv = document.getElementById('answer');
             if (!question) return;
@@ -2134,12 +2135,15 @@
             document.getElementById('reportSection').style.display = 'none';
 
             try {
-                const response = await fetch(`${API}/ask`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question, session_id: SESSION_ID })
-                });
-                const data = await response.json();
+                let data = prefetchedData;
+                if (!data) {
+                    const response = await fetch(`${API}/ask`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question, session_id: SESSION_ID })
+                    });
+                    data = await response.json();
+                }
 
                 // Galeri komutu
                 if (data.answer === '__GALLERY__') {

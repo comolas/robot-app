@@ -17,10 +17,16 @@ class RAGEngine:
             model="models/gemini-embedding-001",
             google_api_key=api_key,
         )
+        chat_model = os.getenv("GEMINI_CHAT_MODEL", "gemini-3.5-flash-lite")
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-flash-latest",
+            model=chat_model,
             google_api_key=api_key,
-            temperature=0.3
+            max_output_tokens=int(os.getenv("GEMINI_LONG_MAX_OUTPUT_TOKENS", "1400")),
+        )
+        self.fast_llm = ChatGoogleGenerativeAI(
+            model=chat_model,
+            google_api_key=api_key,
+            max_output_tokens=int(os.getenv("GEMINI_FAST_MAX_OUTPUT_TOKENS", "420")),
         )
         self.vectordb = None
         self.chain = None
@@ -91,6 +97,7 @@ FORMATLAMA KURALLARI (MUTLAKA UYULMASI GEREKEN):
 4. Başlıktan hemen sonra metne geç; başlık ile paragraf arasında boş satır bırakma
 5. Paragraflar arasında en fazla tek boş satır kullan; art arda boş satır kullanma
 6. Madde işareti kullanma, akıcı paragraflar yaz
+7. Sesli kullanım için kısa ve doğrudan cevap ver; gerekmedikçe 4 paragrafı geçme
 
 ÖRNEK FORMAT:
 İlk bilgi cevabında kısa bir tanıtım cümlesi kullanabilirsin. Takip eden cevaplarda bu cümleyi tekrar etme.
@@ -106,13 +113,13 @@ Cevap:"""
         prompt = ChatPromptTemplate.from_template(template)
         retriever = self.vectordb.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 10}
+            search_kwargs={"k": int(os.getenv("RAG_RESULT_COUNT", "4"))}
         )
         
         self.chain = (
             {"context": retriever, "question": RunnablePassthrough()}
             | prompt
-            | self.llm
+            | self.fast_llm
             | StrOutputParser()
         )
     
@@ -155,7 +162,7 @@ Soru: {question}
 
 Cevap:"""
         )
-        return (prompt | self.llm | StrOutputParser()).invoke({"context": context, "question": question})
+        return (prompt | self.fast_llm | StrOutputParser()).invoke({"context": context, "question": question})
 
     def _read_cached_content(self) -> str:
         for path in (Path("./data/okul_bilgileri_web.md"), Path("./data/okul_bilgileri.md")):
