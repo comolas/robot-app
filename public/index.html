@@ -430,28 +430,28 @@
         .voice-assistant-center {
             position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
         }
-        .voice-visualizer { position: relative; width: clamp(150px, 32vw, 230px); height: clamp(110px, 24vw, 170px); }
+        .voice-visualizer { position: relative; width: clamp(260px, 52vw, 480px); height: clamp(190px, 38vw, 340px); }
         .voice-bubble, .voice-wave {
             position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
             transition: opacity 340ms ease, transform 340ms ease;
         }
         .voice-bubble-shape {
-            position: relative; width: clamp(92px, 20vw, 138px); height: clamp(66px, 14vw, 96px);
+            position: relative; width: clamp(165px, 34vw, 270px); height: clamp(116px, 24vw, 190px);
             border-radius: 46% 46% 48% 48%; background: #fff;
             transform: scale(var(--voice-input-scale, 1));
         }
         .voice-bubble-shape::after {
             content: ''; position: absolute; left: 18%; bottom: -13px;
-            width: 28px; height: 28px; background: #fff; transform: skewY(-28deg) rotate(18deg);
+            width: clamp(34px, 7vw, 52px); height: clamp(34px, 7vw, 52px); background: #fff; transform: skewY(-28deg) rotate(18deg);
             border-radius: 3px 0 6px 4px;
         }
-        .voice-thinking-dots { display: none; position: absolute; z-index: 1; gap: 8px; }
-        .voice-thinking-dots i { width: 8px; height: 8px; border-radius: 50%; background: #000; animation: voiceDot 1.15s ease-in-out infinite; }
+        .voice-thinking-dots { display: none; position: absolute; z-index: 1; gap: clamp(10px, 2vw, 16px); }
+        .voice-thinking-dots i { width: clamp(11px, 2.2vw, 16px); height: clamp(11px, 2.2vw, 16px); border-radius: 50%; background: #000; animation: voiceDot 1.15s ease-in-out infinite; }
         .voice-thinking-dots i:nth-child(2) { animation-delay: 140ms; }
         .voice-thinking-dots i:nth-child(3) { animation-delay: 280ms; }
-        .voice-wave { gap: clamp(5px, 1.2vw, 8px); opacity: 0; transform: scale(0.86); }
+        .voice-wave { gap: clamp(8px, 1.8vw, 14px); opacity: 0; transform: scale(0.86); }
         .voice-wave-bar {
-            width: clamp(7px, 1.5vw, 10px); height: 8px; border-radius: 999px; background: #fff;
+            width: clamp(12px, 2.4vw, 18px); height: 12px; border-radius: 999px; background: #fff;
             will-change: height; transition: height 70ms linear;
         }
         .voice-visualizer[data-state='listening'] .voice-bubble-shape { animation: voiceBreathe 3.2s ease-in-out infinite; }
@@ -1138,7 +1138,7 @@
             bars.forEach((bar, index) => {
                 const target = Math.max(0, Math.min(1, levels[index] || 0));
                 voiceOutputLevels[index] += (target - voiceOutputLevels[index]) * 0.32;
-                bar.style.height = `${8 + voiceOutputLevels[index] * 60}px`;
+                bar.style.height = `${12 + voiceOutputLevels[index] * 104}px`;
             });
         }
 
