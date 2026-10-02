@@ -128,9 +128,9 @@ english_teacher = None
 try:
     from tts_service import TTSService
     tts_service = TTSService()
-    print("✓ Google Cloud TTS yüklendi")
+    print(f"✓ TTS yüklendi: {tts_service.provider_name}")
 except Exception as e:
-    print(f"⚠ Google Cloud TTS yüklenemedi: {e}")
+    print(f"⚠ TTS yüklenemedi: {e}")
     print("TTS olmadan devam ediliyor...")
 
 # STT ve EnglishTeacher
