@@ -2,6 +2,8 @@ import os
 import re
 import time
 import asyncio
+import logging
+from datetime import datetime, timezone, timedelta
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse, Response
@@ -122,6 +124,7 @@ app.add_middleware(
 # Servisler
 rag_engine = None
 tts_service = None
+stt_service = None
 english_teacher = None
 
 # TTS'i opsiyonel yap
@@ -330,6 +333,15 @@ Ders anlatımı:"""
 
 @app.post("/session/start", response_model=Answer)
 async def start_session(req: SessionStart):
+    if req.greeting_type == "teachers_day":
+        today = datetime.now(timezone(timedelta(hours=3)))
+        if (today.month, today.day) != (11, 24):
+            return Answer(answer="", audio_path="")
+        return make_audio_response(
+            "Başta Gazi Mustafa Kemal Atatürk olmak üzere tüm öğretmenlerimizin Öğretmenler Günü'nü kutlarım.",
+            req.session_id,
+            face_state="happy",
+        )
     session = get_session(req.session_id)
     session["asked_name"] = True
     session["last_seen"] = time.time()
@@ -537,7 +549,8 @@ async def ask_question(question: Question):
         return Answer(answer=answer, audio_path=audio_path, session_id=question.session_id, user_name=user_name)
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Soru yanitlanamadi")
+        raise HTTPException(status_code=500, detail=str(e) or type(e).__name__)
 
 @app.get("/audio/{filename}")
 async def get_audio(filename: str):

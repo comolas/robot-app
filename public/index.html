@@ -1785,6 +1785,27 @@
         }
 
         // â”€â”€ TEMA YÃ–NETÄ°MÄ° â”€â”€
+        async function playTeachersDayGreeting() {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Europe/Istanbul', month: 'numeric', day: 'numeric'
+            }).formatToParts(new Date());
+            const month = Number(parts.find(part => part.type === 'month').value);
+            const day = Number(parts.find(part => part.type === 'day').value);
+            if (month !== 11 || day !== 24) return;
+            try {
+                const response = await fetch(`${API}/session/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: SESSION_ID, greeting_type: 'teachers_day' })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (data.answer) playRobotAudio(data.audio_path ? `${API}${data.audio_path}` : '', data.answer);
+            } catch (error) {
+                console.error('Teachers Day greeting failed:', error);
+            }
+        }
+
         function toggleTheme() {
             const html = document.documentElement;
             const btn  = document.getElementById('themeToggle');
@@ -1809,6 +1830,7 @@
                     setInterval(pollPiPresence, 1500);
                 }
                 startAutoGreetingTimer();
+                setTimeout(playTeachersDayGreeting, 7000);
                 requestFullscreenMode();
                 ['click', 'keydown', 'touchstart', 'mousemove'].forEach(type => {
                     document.addEventListener(type, resetIdleTimer, { passive: true });
@@ -2060,6 +2082,10 @@
             try {
                 const r = await fetch(`${API}/voice-ask`, { method: 'POST', body: fd });
                 const data = await r.json();
+                if (!r.ok) {
+                    answerDiv.textContent = data.detail || `HTTP ${r.status}`;
+                    return;
+                }
                 if (data.error || !data.transcript) {
                     answerDiv.innerHTML = `<p style="color:red;">${data.error || 'Ses anlaÅŸÄ±lamadÄ±.'}</p>`;
                     if (voiceConversationActive) setTimeout(beginVoiceListening, 900);
@@ -2143,6 +2169,10 @@
                         body: JSON.stringify({ question, session_id: SESSION_ID })
                     });
                     data = await response.json();
+                    if (!response.ok) {
+                        answerDiv.textContent = data.detail || `HTTP ${response.status}`;
+                        return;
+                    }
                 }
 
                 // Galeri komutu
